@@ -1,0 +1,45 @@
+﻿using MegaCrit.Sts2.Core.Models;
+
+namespace Pikcube.Common.Utility;
+
+public static class CustomRunManager
+{
+    private static List<Type> AdditionalGoodModifiers { get; } = [];
+    private static List<Type> AdditionalBadModifiers { get; } = [];
+    
+    public static void Register<T>(CustomRunType runType, Func<ModifierModel, bool>? dynamicExclusivityTest = null) where T : ModifierModel
+    {
+        switch (runType)
+        {
+            case CustomRunType.Good:
+                AdditionalGoodModifiers.Add(typeof(T));
+                break;
+            case CustomRunType.Bad:
+                AdditionalBadModifiers.Add(typeof(T));
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(runType), runType, null);
+        }
+
+        if (dynamicExclusivityTest is not null)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public static IEnumerable<ModifierModel> GetGoodModifiers()
+    {
+        return AdditionalGoodModifiers.Select(t => ModelDb.GetById<ModifierModel>(ModelDb.GetId(t)));
+    }
+
+    public static IEnumerable<ModifierModel> GetBadModifiers()
+    {
+        return AdditionalBadModifiers.Select(t => ModelDb.GetById<ModifierModel>(ModelDb.GetId(t)));
+    }
+}
+
+public enum CustomRunType
+{
+    Good = 1,
+    Bad = 2,
+}
