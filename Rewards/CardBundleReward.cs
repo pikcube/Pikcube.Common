@@ -21,7 +21,7 @@ public class CardBundleReward : Reward
     private IEnumerable<IEnumerable<CardModel>> InitialCardsToOffer { get; init; }
     protected override RewardType RewardType => RewardType.Card;
     public override int RewardsSetIndex => 8;
-    public override LocString Description => new LocString("powers", "PIKCUBE-CARDBUNDLEDESCRIPTION");
+    public override LocString Description => new("powers", "PIKCUBE-CARDBUNDLEDESCRIPTION");
 
     private bool _isPopulated = false;
     public override bool IsPopulated => _isPopulated;
