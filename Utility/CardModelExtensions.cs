@@ -5,7 +5,7 @@ namespace Pikcube.Common.Utility;
 
 public static class CardModelExtensions
 {
-    extension<T>(T _) where T : CardModel
+    extension<T>(T instance) where T : CardModel
     {
         public static T CreateInstance(Player p)
         {
@@ -19,7 +19,7 @@ public static class CardModelExtensions
 
         public T CreateNewInstance(Player p)
         {
-            return p.RunState.CreateCard<T>(p);
+            return (T)p.RunState.CreateCard(instance.CanonicalInstance, p);
         }
     }
 }

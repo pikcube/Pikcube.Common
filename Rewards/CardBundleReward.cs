@@ -1,13 +1,21 @@
-﻿using MegaCrit.Sts2.Core.Entities.Cards;
+﻿using MegaCrit.Sts2.Core.Combat;
+using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Context;
+using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Extensions;
 using MegaCrit.Sts2.Core.Factories;
+using MegaCrit.Sts2.Core.GameActions;
 using MegaCrit.Sts2.Core.Helpers;
 using MegaCrit.Sts2.Core.Hooks;
 using MegaCrit.Sts2.Core.Localization;
+using MegaCrit.Sts2.Core.Logging;
 using MegaCrit.Sts2.Core.Models;
-using MegaCrit.Sts2.Core.Models.Events;
+using MegaCrit.Sts2.Core.Multiplayer.Game;
 using MegaCrit.Sts2.Core.Rewards;
 using MegaCrit.Sts2.Core.Runs;
+using MegaCrit.Sts2.Core.TestSupport;
+using Pikcube.Common.Screens;
 using Pikcube.Common.Utility;
 
 namespace Pikcube.Common.Rewards;
@@ -23,7 +31,7 @@ public class CardBundleReward : Reward
     public override int RewardsSetIndex => 8;
     public override LocString Description => new("powers", "PIKCUBE-CARDBUNDLEDESCRIPTION");
 
-    private bool _isPopulated = false;
+    private bool _isPopulated;
     public override bool IsPopulated => _isPopulated;
 
     public CardBundleReward(CardCreationOptions options, Player player, int bundleCount = 2, int bundleSize = 3) :
@@ -33,11 +41,6 @@ public class CardBundleReward : Reward
 
     public CardBundleReward(IEnumerable<IEnumerable<CardModel>> cardsToOffer, CardCreationSource source, Player player)  :
         this(null, cardsToOffer, source, player, 0, 0)
-    {
-    }
-
-    public CardBundleReward(CardReward cardReward, int bundleCount = 2, int bundleSize = 3) : 
-        this(cardReward.GetOptions(), [cardReward.Cards], cardReward.GetOptions().Source, cardReward.Player, bundleCount, bundleSize)
     {
     }
 
@@ -71,27 +74,73 @@ public class CardBundleReward : Reward
             List<CardCreationResult> bundle = [..initialBundle.Select(c => new CardCreationResult(c))];
             if (Hook.TryModifyCardRewardOptions(Player.RunState, Player, bundle, Options, out List<AbstractModel> modifiers))
                 await TaskHelper.RunSafely(Hook.AfterModifyingCardRewardOptions(Player.RunState, modifiers));
-            if (bundle.Count < MinimumBundleSize)
+            while (bundle.Count < MinimumBundleSize)
             {
-                int toAdd = MinimumBundleSize - bundle.Count;
-                bundle.AddRange(CardFactory.CreateForReward(Player, toAdd, Options));
-
+                bundle.AddRange(CardFactory.CreateForReward(Player, 1, Options));
             }
             Bundles.Add(bundle);
         }
 
         while (Bundles.Count < MinimumBundleCount)
         {
-            Bundles.Add([..CardFactory.CreateForReward(Player, MinimumBundleSize, Options)]);
+            List<CardCreationResult> bundle = [];
+            while (bundle.Count < MinimumBundleSize)
+            {
+                bundle.AddRange(CardFactory.CreateForReward(Player, 1, Options));
+            }
+            Bundles.Add(bundle);
         }
     }
 
     protected override async Task<bool> OnSelect()
     {
-        throw new NotImplementedException();
+        await Populate();
+        List<List<CardModel>> bundleCards = [.. Bundles
+            .Select(bundle => bundle
+                .Select(cardResult => cardResult.Card.CreateNewInstance(Player))
+                .ToList())];
+
+        bool bundleSelected = false;
+
+        foreach (CardModel card in await CardSelectCmd.FromChooseABundleScreen(Player, bundleCards))
+        {
+            bundleSelected = true; 
+            await CardPileCmd.Add(card, PileType.Deck);
+        }
+
+        return bundleSelected;
     }
 
     public override void MarkContentAsSeen()
     {
+    }
+
+    public static async Task<IEnumerable<CardModel>> FromChooseABundleScreen(
+        Player player,
+        IReadOnlyList<IReadOnlyList<CardModel>> bundles)
+    {
+        if (CombatManager.Instance.IsEnding || bundles.Count == 0)
+        {
+            return [];
+        }
+        uint choiceId = RunManager.Instance.PlayerChoiceSynchronizer.ReserveChoiceId(player);
+        IReadOnlyList<CardModel> cards;
+        if (TestMode.IsOn)
+        {
+            cards = bundles[0];
+        }
+        else if (LocalContext.IsMe(player) && RunManager.Instance.NetService.Type != NetGameType.Replay)
+        {
+            cards = (await ChooseBundleWithCancelScreen.ShowScreen(bundles).CardsSelected()).FirstOrDefault() ?? [];
+            RunManager.Instance.PlayerChoiceSynchronizer.SyncLocalChoice(player, choiceId, PlayerChoiceResult.FromIndex(bundles.IndexOf(cards)));
+        }
+        else
+        {
+            int index = (await RunManager.Instance.PlayerChoiceSynchronizer.WaitForRemoteChoice(player, choiceId)).AsIndex();
+            cards = index < 0 ? [] : bundles[index];
+        }
+        string str = string.Join(",", cards.Select((Func<CardModel, string>)(c => c.Id.Entry)));
+        Log.Info($"Player {player.NetId} chose cards [{str}]");
+        return cards;
     }
 }
