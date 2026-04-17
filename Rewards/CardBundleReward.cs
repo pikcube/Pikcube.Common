@@ -34,8 +34,6 @@ public class CardBundleReward : Reward
     private bool _isPopulated;
     public override bool IsPopulated => _isPopulated;
 
-    protected override string? IconPath => ImageHelper.GetImagePath("ui/reward_screen/reward_icon_card.png");
-
     public CardBundleReward(CardCreationOptions options, Player player, int bundleCount = 2, int bundleSize = 3) :
         this(options, null, options.Source, player, bundleCount, bundleSize)
     {

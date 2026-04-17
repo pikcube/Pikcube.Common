@@ -7,7 +7,7 @@ public static class CustomRunManager
     private static List<Type> AdditionalGoodModifiers { get; } = [];
     private static List<Type> AdditionalBadModifiers { get; } = [];
     
-    public static void Register<T>(CustomRunType runType, Func<ModifierModel, bool>? dynamicExclusivityTest = null) where T : ModifierModel
+    public static void Register<T>(CustomRunType runType) where T : ModifierModel
     {
         switch (runType)
         {
@@ -19,11 +19,6 @@ public static class CustomRunManager
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(runType), runType, null);
-        }
-
-        if (dynamicExclusivityTest is not null)
-        {
-            throw new NotImplementedException();
         }
     }
 
