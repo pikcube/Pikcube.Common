@@ -26,9 +26,9 @@ public static class CustomRunModifierPatches
         [UsedImplicitly]
         public static IReadOnlyList<ModifierModel> Postfix(IReadOnlyList<ModifierModel> __result)
         {
-            List<ModifierModel> allGood = [.. __result, .. CustomRunManager.GetBadModifiers()];
+            List<ModifierModel> allBad = [.. __result, .. CustomRunManager.GetBadModifiers()];
 
-            return allGood.AsReadOnly();
+            return allBad.AsReadOnly();
         }
     }
 }
