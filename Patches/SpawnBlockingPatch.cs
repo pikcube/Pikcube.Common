@@ -7,7 +7,7 @@ using Pikcube.Common.Utility;
 namespace Pikcube.Common.Patches;
 public static class SpawnBlockingPatch
 {
-    [HarmonyPatch(typeof(RelicGrabBag), nameof(RelicGrabBag.PullFromFront), [typeof(RelicRarity), typeof(Func<RelicModel, bool>), typeof(IRunState)])]
+    [HarmonyPatch(typeof(RelicGrabBag), nameof(RelicGrabBag.PullFromFront), typeof(RelicRarity), typeof(Func<RelicModel, bool>), typeof(IRunState))]
     public static class PullFrontPatches
     {
         public static void Prefix(RelicRarity rarity, ref Func<RelicModel, bool> filter, IRunState runState)
@@ -17,7 +17,7 @@ public static class SpawnBlockingPatch
         }
     }
 
-    [HarmonyPatch(typeof(RelicGrabBag), nameof(RelicGrabBag.PullFromBack), [typeof(RelicRarity), typeof(Func<RelicModel, bool>), typeof(IRunState)])]
+    [HarmonyPatch(typeof(RelicGrabBag), nameof(RelicGrabBag.PullFromBack), typeof(RelicRarity), typeof(Func<RelicModel, bool>), typeof(IRunState))]
     public static class PullBackPatches
     {
         public static void Prefix(RelicRarity rarity, ref Func<RelicModel, bool> filter, IRunState runState)
