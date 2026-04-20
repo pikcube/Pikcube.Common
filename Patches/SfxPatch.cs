@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using JetBrains.Annotations;
 using MegaCrit.Sts2.Core.Audio.Debug;
 
 namespace Pikcube.Common.Patches;
@@ -8,6 +9,7 @@ public static class SfxPatch
 {
     public static List<string> SilenceNext { get; } = [];
 
+    [UsedImplicitly]
     public static void Prefix(string streamName, ref float volume, PitchVariance variance)
     {
         if (!SilenceNext.Contains(streamName))

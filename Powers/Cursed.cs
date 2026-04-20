@@ -27,7 +27,7 @@ public class Cursed : CustomPowerModel
 
     public override int ModifyCardPlayCount(CardModel card, Creature? target, int playCount)
     {
-        if (card.Owner != Owner.Player || card.IsDupe || Owner.Player?.PlayerRng.Transformations.NextBool() is not true)
+        if (card.Owner != Owner.Player || card.IsDupe || Owner.Player.RunState.Rng.Shuffle.NextBool() is not true)
         {
             return playCount;
         }
