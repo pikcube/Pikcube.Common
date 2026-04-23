@@ -5,8 +5,13 @@ namespace Pikcube.Common.Utility;
 
 public static class Predicates
 {
-    public static Predicate<IRunState> IsModifierPresent<T>() where T : ModifierModel
+    public static bool IsModifierPresent<T>(IRunState runState) where T : ModifierModel
     {
-        return runState => runState.Modifiers.Any(m => m is T);
+        return runState.Modifiers.Any(m => m is T);
+    }
+
+    public static bool UnlessModifierPresent<T>(IRunState runState) where T : ModifierModel
+    {
+        return !IsModifierPresent<T>(runState);
     }
 }
