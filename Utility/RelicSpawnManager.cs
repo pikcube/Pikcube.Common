@@ -11,7 +11,12 @@ public class RelicSpawnManager
 
     internal static bool CanRelicSpawn(RelicModel canidate, IRunState runState)
     {
-        return !RelicRules.TryGetValue(canidate.GetType(), out Dictionary<RelicSpawnManager, Predicate<IRunState>>? rule) || rule.Values.All(p => p(runState));
+        if (RelicRules.TryGetValue(canidate.GetType(), out Dictionary<RelicSpawnManager, Predicate<IRunState>>? rule))
+        {
+            return rule.Values.All(p => p(runState));
+        }
+
+        return true;
     }
 
     public void RegisterRule<T>(Predicate<IRunState> rule) where T : RelicModel

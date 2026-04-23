@@ -5,7 +5,7 @@ using MegaCrit.Sts2.Core.Runs;
 using Pikcube.Common.Utility;
 
 namespace Pikcube.Common.Patches;
-public static class SpawnBlockingPatch
+public static class RelicGrabBagFilteringPatches
 {
     [HarmonyPatch(typeof(RelicGrabBag), nameof(RelicGrabBag.PullFromFront), typeof(RelicRarity), typeof(Func<RelicModel, bool>), typeof(IRunState))]
     public static class PullFrontPatches
