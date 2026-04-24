@@ -8,7 +8,7 @@
 		<DefaultItemExcludes>packages/**</DefaultItemExcludes>
 		<AppOutputBase>$(MSBuildProjectDirectory)\</AppOutputBase>
 		<PathMap>$(AppOutputBase)=.\</PathMap>
-		<VersionPrefix>0.1.29</VersionPrefix>
+		<VersionPrefix>0.1.32</VersionPrefix>
 	</PropertyGroup>
 
 	<!-- OS Detection -->
@@ -88,13 +88,16 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<AdditionalFiles Remove="Screens\**" />
 		<Compile Remove="Pikcube.Common/**" />
 		<Compile Remove="materials/**" />
 		<Compile Remove="Pikcube.Common\localization\**" />
+		<Compile Remove="Screens\**" />
 		<Compile Remove="shaders/**" />
 		<EmbeddedResource Remove="Pikcube.Common/**" />
 		<EmbeddedResource Remove="materials/**" />
 		<EmbeddedResource Remove="Pikcube.Common\localization\**" />
+		<EmbeddedResource Remove="Screens\**" />
 		<EmbeddedResource Remove="shaders/**" />
 	</ItemGroup>
 
@@ -105,6 +108,10 @@
 		</None>
 		<None Include="project.godot" />
 		<None Include="Pikcube.Common/**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="Pikcube.Common\localization\eng\cards.json" />
 	</ItemGroup>
 
 

@@ -1,8 +1,13 @@
-﻿using MegaCrit.Sts2.Core.Combat;
+﻿using BaseLib.Abstracts;
+using BaseLib.Utils;
+using Godot;
+using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Context;
+using MegaCrit.Sts2.Core.Entities.CardRewardAlternatives;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Entities.Rewards;
 using MegaCrit.Sts2.Core.Extensions;
 using MegaCrit.Sts2.Core.Factories;
 using MegaCrit.Sts2.Core.GameActions;
@@ -11,11 +16,12 @@ using MegaCrit.Sts2.Core.Hooks;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Logging;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.CardPools;
 using MegaCrit.Sts2.Core.Multiplayer.Game;
+using MegaCrit.Sts2.Core.Nodes.Screens.CardSelection;
 using MegaCrit.Sts2.Core.Rewards;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.TestSupport;
-using Pikcube.Common.Screens;
 using Pikcube.Common.Utility;
 
 namespace Pikcube.Common.Rewards;
@@ -95,14 +101,14 @@ public class CardBundleReward : Reward
     protected override async Task<bool> OnSelect()
     {
         await Populate();
-        List<List<CardModel>> bundleCards = [.. Bundles
+        List<List<CardModel>> bundleCards = [[ModelDb.Card<Skip>().CreateNewInstance(Player), ModelDb.Card<Skip>().CreateNewInstance(Player), ModelDb.Card<Skip>().CreateNewInstance(Player)], .. Bundles
             .Select(bundle => bundle
                 .Select(cardResult => cardResult.Card.CreateNewInstance(Player))
                 .ToList())];
 
         bool bundleSelected = false;
 
-        foreach (CardModel card in await CardSelectCmd.FromChooseABundleScreen(Player, bundleCards))
+        foreach (CardModel card in await FromChooseABundleScreen(Player, bundleCards, Generate()))
         {
             bundleSelected = true; 
             await CardPileCmd.Add(card, PileType.Deck);
@@ -111,13 +117,21 @@ public class CardBundleReward : Reward
         return bundleSelected;
     }
 
+    public IReadOnlyList<CardRewardAlternative> Generate()
+    {
+        List<CardRewardAlternative> alternatives = new List<CardRewardAlternative>();
+        alternatives.Add(new CardRewardAlternative("Skip", PostAlternateCardRewardAction.DismissScreenAndKeepReward));
+        return alternatives.Count <= 2 ? (IReadOnlyList<CardRewardAlternative>)alternatives : throw new InvalidOperationException("More than 2 card reward alternatives are not supported.");
+    }
+
     public override void MarkContentAsSeen()
     {
     }
 
     public static async Task<IEnumerable<CardModel>> FromChooseABundleScreen(
         Player player,
-        IReadOnlyList<IReadOnlyList<CardModel>> bundles)
+        IReadOnlyList<IReadOnlyList<CardModel>> bundles,
+        IReadOnlyList<CardRewardAlternative> extraOptions)
     {
         if (CombatManager.Instance.IsEnding || bundles.Count == 0)
         {
@@ -131,7 +145,11 @@ public class CardBundleReward : Reward
         }
         else if (LocalContext.IsMe(player) && RunManager.Instance.NetService.Type != NetGameType.Replay)
         {
-            cards = (await ChooseBundleWithCancelScreen.ShowScreen(bundles).CardsSelected()).FirstOrDefault() ?? [];
+            cards = (await NChooseABundleSelectionScreen.ShowScreen(bundles).CardsSelected()).FirstOrDefault() ?? [];
+            if (cards.Any(c => c is Skip))
+            {
+                cards = [];
+            }
             RunManager.Instance.PlayerChoiceSynchronizer.SyncLocalChoice(player, choiceId, PlayerChoiceResult.FromIndex(bundles.IndexOf(cards)));
         }
         else
@@ -142,5 +160,13 @@ public class CardBundleReward : Reward
         string str = string.Join(",", cards.Select((Func<CardModel, string>)(c => c.Id.Entry)));
         Log.Info($"Player {player.NetId} chose cards [{str}]");
         return cards;
+    }
+}
+
+[Pool(typeof(TokenCardPool))]
+public class Skip : CustomCardModel
+{
+    public Skip() : base(-1, CardType.Status, CardRarity.Token, TargetType.None, false, true)
+    {
     }
 }
