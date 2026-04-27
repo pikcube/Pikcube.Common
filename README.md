@@ -12,7 +12,7 @@ This mod uses C# extension blocks, a language feature added in C# 14. You will n
 
 ## Feature: Relic Spawn Filter API
 
-An API that allows for removing relics from the common Relic Grab Bag. Doesn't prevent relics from swapning from events and ancients.
+An API that allows for removing relics from the common Relic Grab Bag. Doesn't prevent relics from spawning from events and ancients.
 
 Adding a rule is as easy as calling RegisterRule and passing in a filter.
 
