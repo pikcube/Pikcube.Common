@@ -65,4 +65,4 @@ I love extension methods and I add them for nearly everything. Examples include
 
 Eventually you'll be able to install this with NuGet, but for now, you can install it manually.
 
-Download Pikcube.Common.dll, add it as a reference to your project, and include "Pikcube.Common" as a dependency in your mod's json definition. You can copy the .pdb files over if you want them for interactive debugging purposes.
+Download Pikcube.Common.dll, add it as a reference to your project, and include "Pikcube.Common" as a dependency in your mod's json definition. You can copy the .pdb files over to your game's mod directory if you want them for interactive debugging purposes.
