@@ -8,7 +8,7 @@ Just download the .zip file and place the contents of it inside your mods folder
 
 ## Requirements
 
-This mod uses C# extension blocks, a language feature added in C# 14. You will need to add `<LangVersion>14<LangVersion/>` to your project file for this to compile.
+This mod uses C# extension blocks, a language feature added in C# 14. You will need to add `<LangVersion>14<LangVersion/>` to your project file to use this library.
 
 ## Feature: Relic Spawn Filter API
 
