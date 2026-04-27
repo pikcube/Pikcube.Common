@@ -8,11 +8,10 @@ using Pikcube.Common.Utility;
 
 namespace Pikcube.Common.Patches;
 
-
-public static class RunStatePatches
+internal static class RunStatePatches
 {
     [HarmonyPatch(typeof(RunState), "FromSerializable", MethodType.Normal)]
-    public static class RunStateLoadPatches
+    internal static class RunStateLoadPatches
     {
         [UsedImplicitly]
         public static RunState Postfix(RunState __result, SerializableRun save)
@@ -24,7 +23,7 @@ public static class RunStatePatches
     }
 
     [HarmonyPatch(typeof(RunState), "CreateForNewRun", MethodType.Normal)]
-    public static class RunStateCreatePatches
+    internal static class RunStateCreatePatches
     {
         [UsedImplicitly]
         public static RunState Postfix(RunState __result, IReadOnlyList<Player> players,

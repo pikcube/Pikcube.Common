@@ -6,9 +6,118 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 
 namespace Pikcube.Common.Utility;
 
+/// <summary>
+/// Defines an extension block that adds methods to SerializableCards
+/// </summary>
 [UsedImplicitly]
 public static class SerializableCardExtensions
 {
+    extension<T>(T cardBlueprint) where T : SerializableCard
+    {
+        /// <summary>
+        /// Create an instance of the SerializableCard owned by the player.
+        /// </summary>
+        /// <param name="player">The player who will own this card.</param>
+        /// <returns>A CardModel instance owned by the player with all properties set.</returns>
+        /// <exception cref="ArgumentException">Tried to pass a SerializableCard without an Id</exception>
+        public CardModel CreateNewInstance(Player player)
+        {
+            if (cardBlueprint.Id is null)
+            {
+                throw new ArgumentException("Id cannot be null");
+            }
+
+            CardModel card = player.RunState.CreateCard(ModelDb.GetById<CardModel>(cardBlueprint.Id).CanonicalInstance, player);
+
+            for (int n = 0; n < cardBlueprint.CurrentUpgradeLevel; ++n)
+            {
+                card.UpgradeInternal();
+                card.FinalizeUpgradeInternal();
+            }
+
+            cardBlueprint.Props?.Fill(card);
+
+            if (cardBlueprint.Enchantment is null)
+            {
+                return card;
+            }
+
+            card.EnchantInternal(EnchantmentModel.FromSerializable(cardBlueprint.Enchantment), cardBlueprint.Enchantment.Amount);
+            card.Enchantment?.ModifyCard();
+            card.FinalizeUpgradeInternal();
+
+            return card;
+        }
+
+        /// <summary>
+        /// Find the first CardModel in a pile that is equal by value to the SerializeableCard. Throws an exception if the card is not found.
+        /// </summary>
+        /// <param name="pile">The pile containing the cards.</param>
+        /// <returns>A CardModel instance within the specified pile.</returns>
+        [UsedImplicitly]
+        public CardModel LoadCardFrom(CardPile pile)
+        {
+            return pile.Cards.First(c => IsEqual(c, cardBlueprint));
+        }
+
+        /// <summary>
+        /// Find the first CardModel in a pile that is equal by value to the SerializeableCard. Returns null if not found.
+        /// </summary>
+        /// <param name="pile">The pile containing the cards.</param>
+        /// <returns>A CardModel instance within the specified pile or null if none was found.</returns>
+        [UsedImplicitly]
+        public CardModel? LoadCardFromOrDefault(CardPile pile)
+        {
+            return pile.Cards.FirstOrDefault(c => IsEqual(c, cardBlueprint));
+        }
+
+        /// <summary>
+        /// Find the first CardModel instances in a pile that are equal by value to the SerializableCard instances. Throws an exception if not all cards are found.
+        /// </summary>
+        /// <param name="serializableCards">The cards to find.</param>
+        /// <param name="pile">The pile containing the cards.</param>
+        /// <returns>A list of CardModels containing the matching cards in the pile.</returns>
+        [UsedImplicitly]
+        public static List<CardModel> LoadCardsFromPile(IEnumerable<SerializableCard> serializableCards, CardPile pile)
+        {
+            List<CardModel> cards = [];
+
+            foreach (SerializableCard blueprint in serializableCards)
+            {
+                cards.Add(pile.Cards.Where(c => !cards.Contains(c))
+                    .First(c => IsEqual(c, blueprint)));
+            }
+
+            return cards;
+        }
+
+        /// <summary>
+        /// Find the first CardModel instances in a pile that are equal by value to the SerializableCard instances if they exist.
+        /// </summary>
+        /// <param name="serializableCards">The cards to find.</param>
+        /// <param name="pile">The pile containing the cards.</param>
+        /// <returns>A list of CardModels containing the matching cards in the pile. Cards not found are omitted.</returns>
+        [UsedImplicitly]
+        public static List<CardModel> LoadCardsFromPileIfExist(IEnumerable<SerializableCard> serializableCards, CardPile pile)
+        {
+            List<CardModel> cards = [];
+
+            foreach (SerializableCard blueprint in serializableCards)
+            {
+                CardModel? cardModel = pile.Cards.Where(c => !cards.Contains(c))
+                    .FirstOrDefault(c => IsEqual(c, blueprint));
+                if (cardModel is null)
+                {
+                    continue;
+                }
+                cards.Add(cardModel);
+            }
+
+            return cards;
+        }
+
+    }
+
     private static bool IsEqual(SavedProperties? leftProps, SavedProperties? rightProps)
     {
         switch (leftCardProps: leftProps, rightCardProps: rightProps)
@@ -80,83 +189,5 @@ public static class SerializableCardExtensions
     private static bool IsEqual(SerializableEnchantment? leftCardEnchantment, EnchantmentModel? rightCardEnchantment) =>
         IsEqual(rightCardEnchantment, leftCardEnchantment);
 
-    public static bool IsEqual(SerializableCard leftCard, CardModel rightCard) => IsEqual(rightCard, leftCard);
-
-    extension<T>(T cardBlueprint) where T : SerializableCard
-    {
-        public CardModel CreateNewInstance(Player p)
-        {
-            if (cardBlueprint.Id is null)
-            {
-                throw new ArgumentException("Id cannot be null");
-            }
-
-            CardModel card = p.RunState.CreateCard(ModelDb.GetById<CardModel>(cardBlueprint.Id).CanonicalInstance, p);
-
-            for (int n = 0; n < cardBlueprint.CurrentUpgradeLevel; ++n)
-            {
-                card.UpgradeInternal();
-                card.FinalizeUpgradeInternal();
-            }
-
-            cardBlueprint.Props?.Fill(card);
-
-            if (cardBlueprint.Enchantment is null)
-            {
-                return card;
-            }
-
-            card.EnchantInternal(EnchantmentModel.FromSerializable(cardBlueprint.Enchantment), cardBlueprint.Enchantment.Amount);
-            card.Enchantment?.ModifyCard();
-            card.FinalizeUpgradeInternal();
-
-            return card;
-        }
-
-        [UsedImplicitly]
-        public CardModel LoadCardFrom(CardPile pile)
-        {
-            return pile.Cards.First(c => ComparisonHelper.IsEqual(c, cardBlueprint));
-        }
-
-        [UsedImplicitly]
-        public CardModel? LoadCardFromOrDefault(CardPile pile)
-        {
-            return pile.Cards.FirstOrDefault(c => ComparisonHelper.IsEqual(c, cardBlueprint));
-        }
-
-        [UsedImplicitly]
-        public static List<CardModel> LoadCardsFromPile(IEnumerable<SerializableCard> cardBlueprints, CardPile pile)
-        {
-            List<CardModel> cards = [];
-
-            foreach (SerializableCard blueprint in cardBlueprints)
-            {
-                cards.Add(pile.Cards.Where(c => !cards.Contains(c))
-                    .First(c => ComparisonHelper.IsEqual(c, blueprint)));
-            }
-
-            return cards;
-        }
-
-        [UsedImplicitly]
-        public static List<CardModel> LoadCardsFromPileIfExist(IEnumerable<SerializableCard> cardBlueprints, CardPile pile)
-        {
-            List<CardModel> cards = [];
-
-            foreach (SerializableCard blueprint in cardBlueprints)
-            {
-                CardModel? cardModel = pile.Cards.Where(c => !cards.Contains(c))
-                    .FirstOrDefault(c => ComparisonHelper.IsEqual(c, blueprint));
-                if (cardModel is null)
-                {
-                    continue;
-                }
-                cards.Add(cardModel);
-            }
-
-            return cards;
-        }
-
-    }
+    private static bool IsEqual(SerializableCard leftCard, CardModel rightCard) => IsEqual(rightCard, leftCard);
 }

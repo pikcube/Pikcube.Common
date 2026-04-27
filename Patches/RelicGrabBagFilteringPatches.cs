@@ -5,10 +5,11 @@ using MegaCrit.Sts2.Core.Runs;
 using Pikcube.Common.Utility;
 
 namespace Pikcube.Common.Patches;
-public static class RelicGrabBagFilteringPatches
+
+internal static class RelicGrabBagFilteringPatches
 {
     [HarmonyPatch(typeof(RelicGrabBag), nameof(RelicGrabBag.PullFromFront), typeof(RelicRarity), typeof(Func<RelicModel, bool>), typeof(IRunState))]
-    public static class PullFrontPatches
+    internal static class PullFrontPatches
     {
         public static void Prefix(RelicRarity rarity, ref Func<RelicModel, bool> filter, IRunState runState)
         {
@@ -18,7 +19,7 @@ public static class RelicGrabBagFilteringPatches
     }
 
     [HarmonyPatch(typeof(RelicGrabBag), nameof(RelicGrabBag.PullFromBack), typeof(RelicRarity), typeof(Func<RelicModel, bool>), typeof(IRunState))]
-    public static class PullBackPatches
+    internal static class PullBackPatches
     {
         public static void Prefix(RelicRarity rarity, ref Func<RelicModel, bool> filter, IRunState runState)
         {

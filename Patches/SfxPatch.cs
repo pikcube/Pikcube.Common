@@ -5,12 +5,12 @@ using MegaCrit.Sts2.Core.Audio.Debug;
 namespace Pikcube.Common.Patches;
 
 [HarmonyPatch(typeof(NDebugAudioManager), nameof(NDebugAudioManager.Play), MethodType.Normal)]
-public static class SfxPatch
+internal static class SfxPatch
 {
-    public static List<string> SilenceNext { get; } = [];
+    internal static List<string> SilenceNext { get; } = [];
 
     [UsedImplicitly]
-    public static void Prefix(string streamName, ref float volume, PitchVariance variance)
+    internal static void Prefix(string streamName, ref float volume, PitchVariance variance)
     {
         if (!SilenceNext.Contains(streamName))
         {

@@ -5,9 +5,9 @@ using Pikcube.Common.Patches;
 
 namespace Pikcube.Common.Vfx;
 
-public static class SilentExhaustVfx
+internal static class SilentExhaustVfx
 {
-    public static NExhaustVfx? Create(NCard card)
+    internal static NExhaustVfx? Create(NCard card)
     {
         SfxPatch.SilenceNext.Add(TmpSfx.cardExhaust);
         return NExhaustVfx.Create(card);

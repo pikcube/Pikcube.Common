@@ -18,13 +18,22 @@ using Pikcube.Common.Vfx;
 
 namespace Pikcube.Common.Powers;
 
+/// <summary>
+/// Custom Power that emulates the Cursed Debuff from Dicey Dungeons. Causes cards to have a 50% chance to be played 0 times. <br/>
+/// Decrements by 1 when succesfully trigggered, and is removed at the end of the turn if any stacks remain. <br/>
+/// Cards that aren't played are always sent to the discard pile and still expend their energy cost.
+/// </summary>
 [UsedImplicitly]
 public class Cursed : CustomPowerModel
 {
+    /// <inheritdoc />
     public override PowerType Type => PowerType.Debuff;
+
+    /// <inheritdoc />
     public override PowerStackType StackType => PowerStackType.Counter;
     private List<CardModel> CursedCards { get; } = [];
 
+    /// <inheritdoc />
     public override int ModifyCardPlayCount(CardModel card, Creature? target, int playCount)
     {
         if (card.Owner != Owner.Player || card.IsDupe || Owner.Player.RunState.Rng.CombatTargets.NextBool() is not true)
@@ -39,6 +48,7 @@ public class Cursed : CustomPowerModel
         return 0;
     }
 
+    /// <inheritdoc />
     public override async Task AfterModifyingCardPlayCount(CardModel card)
     {
         if (Owner.Player is null || !CursedCards.Contains(card))
@@ -80,6 +90,7 @@ public class Cursed : CustomPowerModel
         await PowerCmd.Decrement(this);
     }
 
+    /// <inheritdoc />
     public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
     {
         if (!side.HasFlag(CombatSide.Player))
