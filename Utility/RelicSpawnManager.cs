@@ -6,7 +6,7 @@ namespace Pikcube.Common.Utility;
 
 /// <summary>
 /// Class for adding dynamic filtering rules for relics rewards. Useful for preventing specific relics from spawning in Custom Runs. <br/>
-/// Only prevents relics from spawning from the RelicGrabBag. Event and Ancient relics are unaffected. <br/>
+/// Only prevents relics from spawning from the RelicGrabBag. Event and Ancient relics are unaffected (for now). <br/>
 /// Each RelicSpawnManager instance should be context specific, as each RelicSpawnManager can only register one rule per relic.<br/>
 /// If multiple functions are required, then they need to be merged into a single Predicate or multiple RelicSpawnManagers must be used.
 /// </summary>

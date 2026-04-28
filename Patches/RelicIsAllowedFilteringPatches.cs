@@ -24,7 +24,9 @@ internal class RelicIsAllowedFilteringPatches
                 BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
             if (method != null && method.DeclaringType != typeof(CardModel))
+            {
                 yield return method;
+            }
         }
     }
 

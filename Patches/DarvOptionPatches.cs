@@ -13,7 +13,7 @@ using System.Reflection;
 namespace Pikcube.Common.Patches;
 
 [HarmonyPatch(typeof(Darv), "GenerateInitialOptions")]
-internal class DarvOptionPatches
+internal static class DarvOptionPatches
 {
     internal static bool Prefix(Darv __instance, ref IReadOnlyList<EventOption> __result)
     {
@@ -22,30 +22,32 @@ internal class DarvOptionPatches
             return true;
         }
 
-        List<BetterDarvRelicSet> sets = MainFile.RelicSetCache.ToList();
-        foreach (BetterDarvRelicSet set in sets)
+        List<BetterDarvRelicSet> sets = [.. MainFile.RelicSetCache.Select(set => new BetterDarvRelicSet
         {
-            set.relics = [..set.relics.Where(r => r.IsAllowed(__instance.Owner.RunState))];
-            Func<Player, bool> oldFilter = set.filter;
-            set.filter = p => oldFilter(p) && set.relics.Length > 0;
-        }
+            Relics = [.. set.Relics.Where(r => r.IsAllowed(__instance.Owner.RunState))], 
+            Filter = p => set.Filter(p) && set.Relics.Length > 0
+        })];
+        
 
-        List<EventOption> source = sets.Where(rs => rs.filter(__instance.Owner))
-            .Select(rs => ReverseRelicOption.RelicOption(__instance, (__instance.Rng.NextItem(rs.relics) ?? throw new NoNullAllowedException()).ToMutable())).ToList()
+        List<EventOption> source = sets.Where(rs => rs.Filter(__instance.Owner))
+            .Select(rs => ReverseRelicOption.RelicOption(__instance, (__instance.Rng.NextItem(rs.Relics) ?? throw new NoNullAllowedException()).ToMutable())).ToList()
             .UnstableShuffle(__instance.Rng);
         DustyTome mutable = (DustyTome)ModelDb.Relic<DustyTome>().ToMutable();
         List<EventOption> list;
         if (__instance.Rng.NextBool() && mutable.IsAllowed(__instance.Owner.RunState))
         {
-            list = source.Take(2).ToList<EventOption>();
+            list = [.. source.Take(2)];
 
             if (__instance.Owner != null)
+            {
                 mutable.SetupForPlayer(__instance.Owner);
+            }
+
             list.Add(ReverseRelicOption.RelicOption(__instance, mutable));
         }
         else
         {
-            list = source.Take(3).ToList();
+            list = [.. source.Take(3)];
         }
 
         __result = list;
@@ -55,20 +57,9 @@ internal class DarvOptionPatches
         return false;
     }
 
-    internal class BetterDarvRelicSet
+    internal readonly struct BetterDarvRelicSet
     {
-        public Func<Player, bool> filter { get; set; }
-        public RelicModel[] relics { get; set; }
-    }
-}
-
-[HarmonyPatch]
-internal class ReverseRelicOption
-{
-    [HarmonyReversePatch]
-    [HarmonyPatch(typeof(AncientEventModel), "RelicOption", [typeof(RelicModel), typeof(string), typeof(string)])]
-    internal static EventOption RelicOption(object instance, RelicModel relic, string pageName = "INITIAL", string? customDonePage = null)
-    {
-        throw new NotImplementedException();
+        public required Func<Player, bool> Filter { get; init; }
+        public required RelicModel[] Relics { get; init; }
     }
 }

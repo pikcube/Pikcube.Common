@@ -66,8 +66,8 @@ public partial class MainFile : Node
 
             RelicSetCache.Add(new DarvOptionPatches.BetterDarvRelicSet
             {
-                filter = filter,
-                relics = relics
+                Filter = filter,
+                Relics = relics
             });
         }
     }
