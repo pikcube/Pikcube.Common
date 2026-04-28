@@ -62,10 +62,11 @@ internal class DarvOptionPatches
     }
 }
 
+[HarmonyPatch]
 internal class ReverseRelicOption
 {
     [HarmonyReversePatch]
-    [HarmonyPatch(typeof(AncientEventModel), "RelicOption")]
+    [HarmonyPatch(typeof(AncientEventModel), "RelicOption", [typeof(RelicModel), typeof(string), typeof(string)])]
     internal static EventOption RelicOption(object instance, RelicModel relic, string pageName = "INITIAL", string? customDonePage = null)
     {
         throw new NotImplementedException();
