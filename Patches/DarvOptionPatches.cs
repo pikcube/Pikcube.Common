@@ -6,9 +6,6 @@ using MegaCrit.Sts2.Core.Extensions;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Events;
 using MegaCrit.Sts2.Core.Models.Relics;
-using MegaCrit.Sts2.Core.Random;
-using MegaCrit.Sts2.Core.Runs;
-using System.Reflection;
 
 namespace Pikcube.Common.Patches;
 
@@ -30,7 +27,8 @@ internal static class DarvOptionPatches
         
 
         List<EventOption> source = sets.Where(rs => rs.Filter(__instance.Owner))
-            .Select(rs => ReverseRelicOption.RelicOption(__instance, (__instance.Rng.NextItem(rs.Relics) ?? throw new NoNullAllowedException()).ToMutable())).ToList()
+            .Select(rs => ReverseRelicOption.RelicOption(__instance, __instance.Rng.NextItem(rs.Relics)?.ToMutable() ?? throw new NoNullAllowedException()))
+            .ToList()
             .UnstableShuffle(__instance.Rng);
         DustyTome mutable = (DustyTome)ModelDb.Relic<DustyTome>().ToMutable();
         List<EventOption> list;
