@@ -15,7 +15,7 @@ namespace Pikcube.Common.Patches;
 [HarmonyPatch(typeof(Darv), "GenerateInitialOptions")]
 internal class DarvOptionPatches
 {
-    internal bool Prefix(Darv __instance, ref IReadOnlyList<EventOption> __result)
+    internal static bool Prefix(Darv __instance, ref IReadOnlyList<EventOption> __result)
     {
         if (__instance.Owner is null)
         {
@@ -48,7 +48,7 @@ internal class DarvOptionPatches
             list = source.Take(3).ToList();
         }
 
-        __result = (IReadOnlyList<EventOption>)list;
+        __result = list;
 
 
 
