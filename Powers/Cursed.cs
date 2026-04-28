@@ -32,10 +32,26 @@ public class Cursed : CustomPowerModel
     /// <inheritdoc />
     public override PowerStackType StackType => PowerStackType.Counter;
     private List<CardModel> CursedCards { get; } = [];
+    private Dictionary<CardModel, AutoPlayType> AutoPlayedCards { get; } = [];
+
+    /// <inheritdoc />
+    public override Task BeforeCardAutoPlayed(CardModel card, Creature? target, AutoPlayType type)
+    {
+        AutoPlayedCards.Add(card, type);
+        return Task.CompletedTask;
+    }
 
     /// <inheritdoc />
     public override int ModifyCardPlayCount(CardModel card, Creature? target, int playCount)
-    {
+    { 
+        if (AutoPlayedCards.Remove(card, out AutoPlayType autoType))
+        {
+            if (autoType != AutoPlayType.SlyDiscard)
+            {
+                return playCount;
+            }
+        }
+
         if (card.Owner != Owner.Player || card.IsDupe || Owner.Player.RunState.Rng.CombatTargets.NextBool() is not true)
         {
             return playCount;
@@ -81,6 +97,7 @@ public class Cursed : CustomPowerModel
                 NCombatRoom.Instance.Ui.AddChildSafely(SilentExhaustVfx.Create(findOnTable));
             }
         }
+
 
         if (card.Pile?.Type is PileType.Play)
         {

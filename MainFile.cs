@@ -1,6 +1,16 @@
+using System.Data;
+using System.Reflection;
 using Godot;
 using HarmonyLib;
+using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.GameActions;
 using MegaCrit.Sts2.Core.Modding;
+using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Events;
+using MegaCrit.Sts2.Core.Runs;
+using Pikcube.Common.Patches;
+using Pikcube.Common.Utility;
 
 namespace Pikcube.Common;
 
@@ -10,6 +20,8 @@ namespace Pikcube.Common;
 [ModInitializer(nameof(Initialize))]
 public partial class MainFile : Node
 {
+    internal static List<DarvOptionPatches.BetterDarvRelicSet> RelicSetCache { get; } = [];
+
     /// <summary>
     /// The ModId
     /// </summary>
@@ -28,5 +40,35 @@ public partial class MainFile : Node
         Harmony harmony = new(ModId);
 
         harmony.PatchAll();
+
+        BetterHooks.AfterOneTimeInitialization += BetterHooks_AfterOneTimeInitialization;
+    }
+
+    private static void BetterHooks_AfterOneTimeInitialization()
+    {
+        FieldInfo fieldInfo = AccessTools.Field(typeof(Darv), "_validRelicSets");
+        object val = fieldInfo.GetValue(null) ?? throw new NoNullAllowedException();
+
+        MethodInfo method = AccessTools.DeclaredMethod(val.GetType(), "GetEnumerator", []);
+        object enumerator = method.Invoke(val, []) ?? throw new NoNullAllowedException();
+
+        PropertyInfo current = AccessTools.DeclaredProperty(enumerator.GetType(), "Current");
+        MethodInfo moveNext = AccessTools.DeclaredMethod(enumerator.GetType(), "MoveNext");
+        while (moveNext.Invoke(enumerator, []) is true)
+        {
+            object curVal = current.GetValue(enumerator) ?? throw new NoNullAllowedException();
+            
+            FieldInfo filterInfo = AccessTools.DeclaredField(curVal.GetType(), "filter");
+            FieldInfo relicInfo = AccessTools.DeclaredField(curVal.GetType(), "relics");
+
+            Func<Player, bool> filter = (Func<Player, bool>?)filterInfo.GetValue(curVal) ?? throw new NoNullAllowedException();
+            RelicModel[] relics = (RelicModel[]?)relicInfo.GetValue(curVal) ?? throw new NoNullAllowedException();
+
+            RelicSetCache.Add(new DarvOptionPatches.BetterDarvRelicSet
+            {
+                filter = filter,
+                relics = relics
+            });
+        }
     }
 }

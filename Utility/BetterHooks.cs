@@ -58,4 +58,19 @@ public static class BetterHooks
     {
         AfterCreatingNewRun?.Invoke(runState, players, acts, modifiers, gameMode, ascensionLevel, seed);
     }
+
+    /// <summary>
+    /// Defines a named void method
+    /// </summary>
+    public delegate void AfterOneTimeInitializationHandler();
+
+    /// <summary>
+    /// Invoked immediately after OneTimeInitialization finishes. Useful for code that would be in your mod initialize method, but can't be because ModelDB hasn't been initialized yet.
+    /// </summary>
+    public static event AfterOneTimeInitializationHandler? AfterOneTimeInitialization;
+
+    internal static void OnOneTimeInitializationFinished()
+    {
+        AfterOneTimeInitialization?.Invoke();
+    }
 }
