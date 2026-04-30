@@ -5,6 +5,7 @@ using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Helpers;
@@ -31,36 +32,53 @@ public class Cursed : CustomPowerModel
 
     /// <inheritdoc />
     public override PowerStackType StackType => PowerStackType.Counter;
+
+    private List<CardModel> ValidCards { get; } = [];
     private List<CardModel> CursedCards { get; } = [];
-    private Dictionary<CardModel, AutoPlayType> AutoPlayedCards { get; } = [];
+    private List<CardModel> IgnoredCards { get; } = [];
+    private Player? OwningPlayer { get; set; }
+
+    /// <inheritdoc />
+    public override async Task AfterApplied(Creature? applier, CardModel? cardSource)
+    {
+        if (Owner.Player is null)
+        {
+            await PowerCmd.Remove(this);
+            return;
+        }
+
+        OwningPlayer = Owner.Player;
+
+        PlayerCombatState? owningPlayerPlayerCombatState = OwningPlayer.PlayerCombatState;
+        if (owningPlayerPlayerCombatState is null)
+        {
+            await PowerCmd.Remove(this);
+            return;
+        }
+        ValidCards.AddRange(owningPlayerPlayerCombatState.DrawPile.Cards);
+        ValidCards.AddRange(owningPlayerPlayerCombatState.Hand.Cards);
+        ValidCards.AddRange(owningPlayerPlayerCombatState.DiscardPile.Cards);
+        ValidCards.AddRange(owningPlayerPlayerCombatState.PlayPile.Cards);
+    }
 
     /// <inheritdoc />
     public override Task BeforeCardAutoPlayed(CardModel card, Creature? target, AutoPlayType type)
     {
-        if (card.Owner != Owner.Player)
+        if (card.Owner != Owner.Player || type == AutoPlayType.SlyDiscard)
         {
             return Task.CompletedTask;
         }
 
-        AutoPlayedCards[card] = type;
+        IgnoredCards.Add(card);
         return Task.CompletedTask;
     }
 
     /// <inheritdoc />
     public override int ModifyCardPlayCount(CardModel card, Creature? target, int playCount)
-    { 
-        if (AutoPlayedCards.Remove(card, out AutoPlayType autoType))
-        {
-            if (autoType != AutoPlayType.SlyDiscard)
-            {
-                return playCount;
-            }
-        }
+    {
+        bool isIgnored = IgnoredCards.Remove(card);
 
-        bool isNotFree = card.HasStarCostX || card.EnergyCost.CostsX || card.CurrentStarCost > 0 || card.EnergyCost.GetAmountToSpend() > 0;
-
-
-        if (!isNotFree || card.Owner != Owner.Player || card.IsDupe || Owner.Player.RunState.Rng.CombatTargets.NextBool() is not true)
+        if (isIgnored || ValidCards.Contains(card) || card.Owner != Owner.Player || card.IsDupe || Owner.Player.RunState.Rng.CombatCardSelection.NextBool() is not true)
         {
             return playCount;
         }
@@ -124,5 +142,14 @@ public class Cursed : CustomPowerModel
         }
 
         await PowerCmd.Remove(this);
+    }
+
+    /// <inheritdoc />
+    public override Task AfterRemoved(Creature oldOwner)
+    {
+        ValidCards.Clear();
+        IgnoredCards.Clear();
+        CursedCards.Clear();
+        return Task.CompletedTask;
     }
 }
