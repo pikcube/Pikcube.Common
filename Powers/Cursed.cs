@@ -37,7 +37,12 @@ public class Cursed : CustomPowerModel
     /// <inheritdoc />
     public override Task BeforeCardAutoPlayed(CardModel card, Creature? target, AutoPlayType type)
     {
-        AutoPlayedCards.Add(card, type);
+        if (card.Owner != Owner.Player)
+        {
+            return Task.CompletedTask;
+        }
+
+        AutoPlayedCards[card] = type;
         return Task.CompletedTask;
     }
 
@@ -52,7 +57,10 @@ public class Cursed : CustomPowerModel
             }
         }
 
-        if (card.Owner != Owner.Player || card.IsDupe || Owner.Player.RunState.Rng.CombatTargets.NextBool() is not true)
+        bool isNotFree = card.HasStarCostX || card.EnergyCost.CostsX || card.CurrentStarCost > 0 || card.EnergyCost.GetAmountToSpend() > 0;
+
+
+        if (!isNotFree || card.Owner != Owner.Player || card.IsDupe || Owner.Player.RunState.Rng.CombatTargets.NextBool() is not true)
         {
             return playCount;
         }
