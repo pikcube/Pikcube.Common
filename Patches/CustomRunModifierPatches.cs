@@ -11,24 +11,36 @@ internal static class CustomRunModifierPatches
     [HarmonyPatch(typeof(ModelDb), nameof(ModelDb.GoodModifiers), MethodType.Getter)]
     internal static class GoodModifierPatches
     {
+        private static IReadOnlyList<ModifierModel>? _cached;
         [UsedImplicitly]
         public static IReadOnlyList<ModifierModel> Postfix(IReadOnlyList<ModifierModel> __result)
         {
-            List<ModifierModel> allGood = [..__result, ..CustomRunManager.GetGoodModifiers()];
+            if (_cached is not null)
+            {
+                return _cached;
+            }
+            List<ModifierModel> allGood = [.. CustomRunManager.GetGoodModifiers(__result)];
+            _cached = allGood.AsReadOnly();
 
-            return allGood.AsReadOnly();
+            return _cached;
         }
     }
 
     [HarmonyPatch(typeof(ModelDb), nameof(ModelDb.BadModifiers), MethodType.Getter)]
     internal static class BadModifierPatches
     {
+        private static IReadOnlyList<ModifierModel>? _cached;
         [UsedImplicitly]
         public static IReadOnlyList<ModifierModel> Postfix(IReadOnlyList<ModifierModel> __result)
         {
-            List<ModifierModel> allBad = [.. __result, .. CustomRunManager.GetBadModifiers()];
+            if (_cached is not null)
+            {
+                return _cached;
+            }
+            List<ModifierModel> allBad = [.. CustomRunManager.GetBadModifiers(__result)];
 
-            return allBad.AsReadOnly();
+            _cached = allBad.AsReadOnly();
+            return _cached;
         }
     }
 }

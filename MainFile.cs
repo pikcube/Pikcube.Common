@@ -2,12 +2,11 @@ using System.Data;
 using System.Reflection;
 using Godot;
 using HarmonyLib;
-using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Modding;
 using MegaCrit.Sts2.Core.Models;
-using MegaCrit.Sts2.Core.Models.Cards;
 using MegaCrit.Sts2.Core.Models.Events;
+using Pikcube.Common.Abstracts;
 using Pikcube.Common.Patches;
 using Pikcube.Common.Utility;
 
@@ -41,16 +40,44 @@ public partial class MainFile : Node
         harmony.PatchAll();
 
         BetterHooks.AfterOneTimeInitialization += BetterHooks_AfterOneTimeInitialization;
-        ModHelper.SubscribeForCombatStateHooks(ModId, CombatStateHooks);
-    }
-
-    private static IEnumerable<AbstractModel> CombatStateHooks(CombatState combatState)
-    {
-        yield return ModelDb.GetModel<Keywords.BlinkModel>();
     }
 
     private static void BetterHooks_AfterOneTimeInitialization()
     {
+        InitDarvCache();
+        RegisterCustomRunModifiers();
+    }
+
+    private static void RegisterCustomRunModifiers()
+    {
+        FieldInfo contentFieldInfo = AccessTools.Field(typeof(ModelDb), "_contentById") ?? throw new NoNullAllowedException();
+        Dictionary<ModelId, AbstractModel> allModels = (Dictionary<ModelId, AbstractModel>?)contentFieldInfo.GetValue(null) ?? throw new NoNullAllowedException();
+
+        foreach (CustomRunModifierModel modifier in allModels.Values.OfType<CustomRunModifierModel>()
+                     .OrderBy(modifier => modifier.Info.Priority)
+                     .ThenBy(modifier => modifier.Info.Primary)
+                     .ThenBy(modifier => modifier.Info.Secondary))
+        {
+            switch (modifier.RunType)
+            {
+                case CustomRunType.None:
+                    break;
+                case CustomRunType.Good:
+                case CustomRunType.Bad:
+                    CustomRunManager.RegisterInteranl(modifier);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+    }
+
+    private static void InitDarvCache()
+    {
+        if (RelicSetCache.Count > 0)
+        {
+            return;
+        }
         FieldInfo fieldInfo = AccessTools.Field(typeof(Darv), "_validRelicSets");
         object val = fieldInfo.GetValue(null) ?? throw new NoNullAllowedException();
 
@@ -76,5 +103,4 @@ public partial class MainFile : Node
             });
         }
     }
-
 }

@@ -1,4 +1,6 @@
-﻿using MegaCrit.Sts2.Core.Models;
+﻿using BaseLib.Abstracts;
+using MegaCrit.Sts2.Core.Models;
+using Pikcube.Common.Abstracts;
 
 namespace Pikcube.Common.Utility;
 
@@ -7,8 +9,8 @@ namespace Pikcube.Common.Utility;
 /// </summary>
 public static class CustomRunManager
 {
-    private static List<Type> AdditionalGoodModifiers { get; } = [];
-    private static List<Type> AdditionalBadModifiers { get; } = [];
+    private static HashSet<Type> AdditionalGoodModifiers { get; } = [];
+    private static HashSet<Type> AdditionalBadModifiers { get; } = [];
 
     /// <summary>
     /// Add a modifier to the Custom Run Menu.
@@ -16,7 +18,7 @@ public static class CustomRunManager
     /// <param name="runType">The type of run modifier (Good for Green, Bad for Red).</param>
     /// <typeparam name="T">The modifier to add.</typeparam>
     /// <exception cref="ArgumentOutOfRangeException">Thrown if the CustomRunType is out is not one of Good or Bad.</exception>
-    public static void Register<T>(CustomRunType runType) where T : ModifierModel
+    public static void Register<T>(CustomRunType runType) where T : CustomRunModifierModel
     {
         switch (runType)
         {
@@ -31,14 +33,75 @@ public static class CustomRunManager
         }
     }
 
-    internal static IEnumerable<ModifierModel> GetGoodModifiers()
+    internal static void RegisterInteranl(CustomRunModifierModel modifier)
     {
-        return AdditionalGoodModifiers.Select(t => ModelDb.GetById<ModifierModel>(ModelDb.GetId(t)));
+        switch (modifier.RunType)
+        {
+            case CustomRunType.Good:
+                AdditionalGoodModifiers.Add(modifier.GetType());
+                break;
+            case CustomRunType.Bad:
+                AdditionalBadModifiers.Add(modifier.GetType());
+                break;
+            case CustomRunType.None:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(modifier), modifier.RunType, null);
+        }
     }
 
-    internal static IEnumerable<ModifierModel> GetBadModifiers()
+    internal static IEnumerable<ModifierModel> GetGoodModifiers(IReadOnlyList<ModifierModel> baseGameModifiers)
     {
-        return AdditionalBadModifiers.Select(t => ModelDb.GetById<ModifierModel>(ModelDb.GetId(t)));
+        bool isBaseGameItterated = false;
+        foreach (ModifierModel m in AdditionalGoodModifiers.Select(t => ModelDb.GetById<ModifierModel>(ModelDb.GetId(t))))
+        {
+            if (m is not CustomRunModifierModel custom)
+            {
+                continue;
+            }
+
+            if (isBaseGameItterated || (int)custom.Info.Priority < 3)
+            {
+                yield return m;
+                continue;
+            }
+
+            foreach (ModifierModel baseModel in baseGameModifiers)
+            {
+                yield return baseModel;
+            }
+
+            isBaseGameItterated = true;
+
+            yield return m;
+        }
+    }
+
+    internal static IEnumerable<ModifierModel> GetBadModifiers(IReadOnlyList<ModifierModel> baseGameModifiers)
+    {
+        bool isBaseGameItterated = false;
+        foreach (ModifierModel m in AdditionalBadModifiers.Select(t => ModelDb.GetById<ModifierModel>(ModelDb.GetId(t))))
+        {
+            if (m is not CustomRunModifierModel custom)
+            {
+                continue;
+            }
+
+            if (isBaseGameItterated || custom.Info.Priority is not ModifierPriority.PostfixGeneric and ModifierPriority.PostfixSegmented)
+            {
+                yield return m;
+                continue;
+            }
+
+            foreach (ModifierModel baseModel in baseGameModifiers)
+            {
+                yield return baseModel;
+            }
+
+            isBaseGameItterated = true;
+
+            yield return m;
+        }
     }
 }
 
@@ -47,6 +110,10 @@ public static class CustomRunManager
 /// </summary>
 public enum CustomRunType
 {
+    /// <summary>
+    /// Do not include modifier in list
+    /// </summary>
+    None = 0,
     /// <summary>
     /// Green Modifier.
     /// </summary>

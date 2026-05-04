@@ -17,6 +17,7 @@ using MegaCrit.Sts2.Core.Nodes.Vfx;
 using MegaCrit.Sts2.Core.Nodes.Cards;
 using MegaCrit.Sts2.Core.Nodes.Rooms;
 using MegaCrit.Sts2.Core.Runs;
+using Pikcube.Common.Keywords;
 using Pikcube.Common.Vfx;
 
 namespace Pikcube.Common.Powers;
@@ -132,7 +133,7 @@ public class Cursed : CustomPowerModel
             }
         }
 
-        CardCmd.ApplyKeyword(card, Utility.Keywords.Blink);
+        CardCmd.ApplyKeyword(card, BlinkModel.Blink);
 
         if (card.Pile?.Type is PileType.Play)
         {
