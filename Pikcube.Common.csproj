@@ -103,16 +103,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Include=".editorconfig" />
 		<None Include=".gitignore" />
 		<None Include="Pikcube.Common.json">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Include="project.godot" />
 		<None Include="Pikcube.Common/**" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Remove="Pikcube.Common\localization\eng\cards.json" />
 	</ItemGroup>
 
 

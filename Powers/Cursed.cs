@@ -9,6 +9,8 @@ using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Helpers;
+using MegaCrit.Sts2.Core.HoverTips;
+using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Nodes.Vfx;
@@ -37,6 +39,13 @@ public class Cursed : CustomPowerModel
     private List<CardModel> CursedCards { get; } = [];
     private List<CardModel> IgnoredCards { get; } = [];
     private Player? OwningPlayer { get; set; }
+
+    /// <inheritdoc />
+    protected override IEnumerable<IHoverTip> ExtraHoverTips =>
+    [
+        new HoverTip(new LocString(locTable, "PIKCUBE-CURSED.blinkTitle"),
+            new LocString(locTable, "PIKCUBE-CURSED.blinkDescription"))
+    ];
 
     /// <inheritdoc />
     public override async Task AfterApplied(Creature? applier, CardModel? cardSource)
@@ -78,12 +87,10 @@ public class Cursed : CustomPowerModel
     {
         bool isIgnored = IgnoredCards.Remove(card);
 
-        if (isIgnored || ValidCards.Contains(card) || card.Owner != Owner.Player || card.IsDupe || Owner.Player.RunState.Rng.CombatCardSelection.NextBool() is not true)
+        if (isIgnored || !ValidCards.Contains(card) || card.Owner != Owner.Player || card.IsDupe || card.Affliction is not null || Owner.Player.RunState.Rng.CombatCardSelection.NextBool() is not true)
         {
             return playCount;
         }
-
-        Flash();
 
         CursedCards.Add(card);
 
@@ -99,6 +106,7 @@ public class Cursed : CustomPowerModel
         }
 
         CursedCards.Remove(card);
+        Flash();
 
         if (Owner.Player.NetId == RunManager.Instance.NetService.NetId)
         {
@@ -124,10 +132,11 @@ public class Cursed : CustomPowerModel
             }
         }
 
+        CardCmd.ApplyKeyword(card, Utility.Keywords.Blink);
 
         if (card.Pile?.Type is PileType.Play)
         {
-            await CardPileCmd.Add(card, PileType.Discard);
+            CardPileAddResult result = await CardPileCmd.Add(card, PileType.Exhaust);
         }
 
         await PowerCmd.Decrement(this);

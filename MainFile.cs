@@ -2,9 +2,11 @@ using System.Data;
 using System.Reflection;
 using Godot;
 using HarmonyLib;
+using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Modding;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Cards;
 using MegaCrit.Sts2.Core.Models.Events;
 using Pikcube.Common.Patches;
 using Pikcube.Common.Utility;
@@ -39,6 +41,12 @@ public partial class MainFile : Node
         harmony.PatchAll();
 
         BetterHooks.AfterOneTimeInitialization += BetterHooks_AfterOneTimeInitialization;
+        ModHelper.SubscribeForCombatStateHooks(ModId, CombatStateHooks);
+    }
+
+    private static IEnumerable<AbstractModel> CombatStateHooks(CombatState combatState)
+    {
+        yield return ModelDb.GetModel<Keywords.BlinkModel>();
     }
 
     private static void BetterHooks_AfterOneTimeInitialization()
@@ -68,4 +76,5 @@ public partial class MainFile : Node
             });
         }
     }
+
 }
