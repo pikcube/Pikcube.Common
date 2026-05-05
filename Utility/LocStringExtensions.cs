@@ -3,6 +3,9 @@ using MegaCrit.Sts2.Core.Models.Cards;
 
 namespace Pikcube.Common.Utility;
 
+/// <summary>
+/// Extensions on the LocString class and LocManager class
+/// </summary>
 public static class LocStringExtensions
 { 
     private static LocManager GetInvariant()

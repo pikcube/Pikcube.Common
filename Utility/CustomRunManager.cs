@@ -33,7 +33,7 @@ public static class CustomRunManager
         }
     }
 
-    internal static void RegisterInteranl(CustomRunModifierModel modifier)
+    internal static void RegisterInternal(CustomRunModifierModel modifier)
     {
         switch (modifier.RunType)
         {

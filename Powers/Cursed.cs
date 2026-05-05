@@ -36,9 +36,9 @@ public class Cursed : CustomPowerModel
     /// <inheritdoc />
     public override PowerStackType StackType => PowerStackType.Counter;
 
-    private List<CardModel> ValidCards { get; } = [];
-    private List<CardModel> CursedCards { get; } = [];
-    private List<CardModel> IgnoredCards { get; } = [];
+    private Dictionary<Player, List<CardModel>> ValidCards { get; } = [];
+    private Dictionary<Player, List<CardModel>> CursedCards { get; } = [];
+    private Dictionary<Player, List<CardModel>> IgnoredCards { get; } = [];
     private Player? OwningPlayer { get; set; }
 
     /// <inheritdoc />
@@ -65,10 +65,15 @@ public class Cursed : CustomPowerModel
             await PowerCmd.Remove(this);
             return;
         }
-        ValidCards.AddRange(owningPlayerPlayerCombatState.DrawPile.Cards);
-        ValidCards.AddRange(owningPlayerPlayerCombatState.Hand.Cards);
-        ValidCards.AddRange(owningPlayerPlayerCombatState.DiscardPile.Cards);
-        ValidCards.AddRange(owningPlayerPlayerCombatState.PlayPile.Cards);
+
+        ValidCards.TryAdd(Owner.Player, []);
+        CursedCards.TryAdd(Owner.Player, []);
+        IgnoredCards.TryAdd(Owner.Player, []);
+
+        ValidCards[Owner.Player].AddRange(owningPlayerPlayerCombatState.DrawPile.Cards);
+        ValidCards[Owner.Player].AddRange(owningPlayerPlayerCombatState.Hand.Cards);
+        ValidCards[Owner.Player].AddRange(owningPlayerPlayerCombatState.DiscardPile.Cards);
+        ValidCards[Owner.Player].AddRange(owningPlayerPlayerCombatState.PlayPile.Cards);
     }
 
     /// <inheritdoc />
@@ -79,21 +84,21 @@ public class Cursed : CustomPowerModel
             return Task.CompletedTask;
         }
 
-        IgnoredCards.Add(card);
+        IgnoredCards[Owner.Player].Add(card);
         return Task.CompletedTask;
     }
 
     /// <inheritdoc />
     public override int ModifyCardPlayCount(CardModel card, Creature? target, int playCount)
     {
-        bool isIgnored = IgnoredCards.Remove(card);
+        bool isIgnored = IgnoredCards[Owner.Player!].Remove(card);
 
-        if (isIgnored || !ValidCards.Contains(card) || card.Owner != Owner.Player || card.IsDupe || card.Affliction is not null || Owner.Player.RunState.Rng.CombatCardSelection.NextBool() is not true)
+        if (isIgnored || !ValidCards[Owner.Player!].Contains(card) || card.Owner != Owner.Player || card.IsDupe || card.Affliction is not null || Owner.Player.RunState.Rng.CombatCardSelection.NextBool() is not true)
         {
             return playCount;
         }
 
-        CursedCards.Add(card);
+        CursedCards[Owner.Player].Add(card);
 
         return 0;
     }
@@ -101,12 +106,12 @@ public class Cursed : CustomPowerModel
     /// <inheritdoc />
     public override async Task AfterModifyingCardPlayCount(CardModel card)
     {
-        if (Owner.Player is null || !CursedCards.Contains(card))
+        if (Owner.Player is null || !CursedCards[Owner.Player].Contains(card))
         {
             return;
         }
 
-        CursedCards.Remove(card);
+        CursedCards[Owner.Player].Remove(card);
         Flash();
 
         if (Owner.Player.NetId == RunManager.Instance.NetService.NetId)
@@ -157,9 +162,9 @@ public class Cursed : CustomPowerModel
     /// <inheritdoc />
     public override Task AfterRemoved(Creature oldOwner)
     {
-        ValidCards.Clear();
-        IgnoredCards.Clear();
-        CursedCards.Clear();
+        ValidCards[oldOwner.Player!].Clear();
+        IgnoredCards[oldOwner.Player!].Clear();
+        CursedCards[oldOwner.Player!].Clear();
         return Task.CompletedTask;
     }
 }

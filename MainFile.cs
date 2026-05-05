@@ -64,7 +64,7 @@ public partial class MainFile : Node
                     break;
                 case CustomRunType.Good:
                 case CustomRunType.Bad:
-                    CustomRunManager.RegisterInteranl(modifier);
+                    CustomRunManager.RegisterInternal(modifier);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
