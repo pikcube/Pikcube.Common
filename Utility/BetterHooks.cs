@@ -1,4 +1,5 @@
 ﻿using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Hooks;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves;
@@ -22,6 +23,10 @@ public static class BetterHooks
     internal static void OnAfterRunInitialized(RunState runState)
     {
         AfterRunInitialized?.Invoke(runState);
+        foreach (IRunInitializedListener listener in runState.IterateHookListeners(null).OfType<IRunInitializedListener>())
+        {
+            listener.AfterRunInitialized(runState);
+        }
     }
 
     /// <summary>
@@ -36,6 +41,10 @@ public static class BetterHooks
     internal static void OnAfterRunLoadedFromSave(RunState runState, SerializableRun save)
     {
         AfterRunLoadedFromSave?.Invoke(runState, save);
+        foreach (IRunLoadedFromSaveListener listener in runState.IterateHookListeners(null).OfType<IRunLoadedFromSaveListener>())
+        {
+            listener.AfterRunLoadedFromSave(runState, save);
+        }
     }
     /// <summary>
     /// Defines a void method that accepts a RunState, a list of Players, a list of Acts, a list of Modifiers, the current GameMode, the current ascension, and the current seed.
@@ -57,6 +66,10 @@ public static class BetterHooks
     internal static void OnAfterCreatingNewRun(RunState runState, IReadOnlyList<Player> players, IReadOnlyList<ActModel> acts, IReadOnlyList<ModifierModel> modifiers, GameMode gameMode, int ascensionLevel, string seed)
     {
         AfterCreatingNewRun?.Invoke(runState, players, acts, modifiers, gameMode, ascensionLevel, seed);
+        foreach (ICreatingNewRunListener listener in runState.IterateHookListeners(null).OfType<ICreatingNewRunListener>())
+        {
+            listener.AfterCreatingNewRun(runState, players, acts, modifiers, gameMode, ascensionLevel, seed);
+        }
     }
 
     /// <summary>
