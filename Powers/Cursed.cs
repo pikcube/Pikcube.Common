@@ -36,9 +36,9 @@ public class Cursed : CustomPowerModel
     /// <inheritdoc />
     public override PowerStackType StackType => PowerStackType.Counter;
 
-    private Dictionary<Player, List<CardModel>> ValidCards { get; } = [];
-    private Dictionary<Player, List<CardModel>> CursedCards { get; } = [];
-    private Dictionary<Player, List<CardModel>> IgnoredCards { get; } = [];
+    private List<CardModel> ValidCards { get; set; } = null!;
+    private List<CardModel> CursedCards { get; set; } = null!;
+    private List<CardModel> IgnoredCards { get; set; } = null!;
     private Player? OwningPlayer { get; set; }
 
     /// <inheritdoc />
@@ -47,6 +47,16 @@ public class Cursed : CustomPowerModel
         new HoverTip(new LocString(locTable, "PIKCUBE-CURSED.blinkTitle"),
             new LocString(locTable, "PIKCUBE-CURSED.blinkDescription"))
     ];
+
+    /// <inheritdoc />
+    protected override void AfterCloned()
+    {
+        base.AfterCloned();
+        OwningPlayer = null;
+        ValidCards = [];
+        CursedCards = [];
+        IgnoredCards = [];
+    }
 
     /// <inheritdoc />
     public override async Task AfterApplied(Creature? applier, CardModel? cardSource)
@@ -66,39 +76,39 @@ public class Cursed : CustomPowerModel
             return;
         }
 
-        ValidCards.TryAdd(Owner.Player, []);
-        CursedCards.TryAdd(Owner.Player, []);
-        IgnoredCards.TryAdd(Owner.Player, []);
-
-        ValidCards[Owner.Player].AddRange(owningPlayerPlayerCombatState.DrawPile.Cards);
-        ValidCards[Owner.Player].AddRange(owningPlayerPlayerCombatState.Hand.Cards);
-        ValidCards[Owner.Player].AddRange(owningPlayerPlayerCombatState.DiscardPile.Cards);
-        ValidCards[Owner.Player].AddRange(owningPlayerPlayerCombatState.PlayPile.Cards);
+        ValidCards.AddRange(owningPlayerPlayerCombatState.DrawPile.Cards);
+        ValidCards.AddRange(owningPlayerPlayerCombatState.Hand.Cards);
+        ValidCards.AddRange(owningPlayerPlayerCombatState.DiscardPile.Cards);
+        ValidCards.AddRange(owningPlayerPlayerCombatState.PlayPile.Cards);
     }
 
     /// <inheritdoc />
     public override Task BeforeCardAutoPlayed(CardModel card, Creature? target, AutoPlayType type)
     {
-        if (card.Owner != Owner.Player || type == AutoPlayType.SlyDiscard)
+        if (card.Owner != OwningPlayer || type == AutoPlayType.SlyDiscard)
         {
             return Task.CompletedTask;
         }
 
-        IgnoredCards[Owner.Player].Add(card);
+        IgnoredCards.Add(card);
         return Task.CompletedTask;
     }
 
     /// <inheritdoc />
     public override int ModifyCardPlayCount(CardModel card, Creature? target, int playCount)
     {
-        bool isIgnored = IgnoredCards[Owner.Player!].Remove(card);
+        if (OwningPlayer is null)
+        {
+            return playCount;
+        }
+        bool isIgnored = IgnoredCards.Remove(card);
 
-        if (isIgnored || !ValidCards[Owner.Player!].Contains(card) || card.Owner != Owner.Player || card.IsDupe || card.Affliction is not null || Owner.Player.RunState.Rng.CombatCardSelection.NextBool() is not true)
+        if (isIgnored || !ValidCards.Contains(card) || card.Owner != OwningPlayer || card.IsDupe || card.Affliction is not null || OwningPlayer.RunState.Rng.CombatCardSelection.NextBool() is not true)
         {
             return playCount;
         }
 
-        CursedCards[Owner.Player].Add(card);
+        CursedCards.Add(card);
 
         return 0;
     }
@@ -106,17 +116,17 @@ public class Cursed : CustomPowerModel
     /// <inheritdoc />
     public override async Task AfterModifyingCardPlayCount(CardModel card)
     {
-        if (Owner.Player is null || !CursedCards[Owner.Player].Contains(card))
+        if (OwningPlayer is null || !CursedCards.Contains(card))
         {
             return;
         }
 
-        CursedCards[Owner.Player].Remove(card);
+        CursedCards.Remove(card);
         Flash();
 
-        if (Owner.Player.NetId == RunManager.Instance.NetService.NetId)
+        if (OwningPlayer.NetId == RunManager.Instance.NetService.NetId)
         {
-            if (Owner.Player == card.Owner && NGame.Instance is not null)
+            if (OwningPlayer == card.Owner && NGame.Instance is not null)
             {
                 AudioStream curseSound = GD.Load<AudioStream>("res://Pikcube.Common/curse.ogg");
                 AudioStreamPlayer player = new()
@@ -162,9 +172,13 @@ public class Cursed : CustomPowerModel
     /// <inheritdoc />
     public override Task AfterRemoved(Creature oldOwner)
     {
-        ValidCards[oldOwner.Player!].Clear();
-        IgnoredCards[oldOwner.Player!].Clear();
-        CursedCards[oldOwner.Player!].Clear();
+        if (OwningPlayer is null)
+        {
+            return Task.CompletedTask;
+        }
+        ValidCards.Clear();
+        IgnoredCards.Clear();
+        CursedCards.Clear();
         return Task.CompletedTask;
     }
 }
