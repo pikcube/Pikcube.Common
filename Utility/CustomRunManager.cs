@@ -1,4 +1,6 @@
-﻿using BaseLib.Abstracts;
+﻿using System.Data;
+using BaseLib.Abstracts;
+using MegaCrit.Sts2.Core.Modding;
 using MegaCrit.Sts2.Core.Models;
 using Pikcube.Common.Abstracts;
 
@@ -12,14 +14,23 @@ public static class CustomRunManager
     private static HashSet<Type> AdditionalGoodModifiers { get; } = [];
     private static HashSet<Type> AdditionalBadModifiers { get; } = [];
 
+    internal static bool IsLocked { get; set; } = false;
+
     /// <summary>
     /// Add a modifier to the Custom Run Menu.
     /// </summary>
     /// <param name="runType">The type of run modifier (Good for Green, Bad for Red).</param>
     /// <typeparam name="T">The modifier to add.</typeparam>
     /// <exception cref="ArgumentOutOfRangeException">Thrown if the CustomRunType is out is not one of Good or Bad.</exception>
-    public static void Register<T>(CustomRunType runType) where T : CustomRunModifierModel
+    /// <exception cref="ReadOnlyException">Throw if a modifier is registered after the cache is initialized.</exception>
+    [Obsolete($"Inheriting modifiers from {nameof(CustomRunModifierModel)} is preferred due to auto add. Manual registration will be remove in the next major version.", false)]
+    public static void Register<T>(CustomRunType runType) where T : ModifierModel
     {
+        if (IsLocked)
+        {
+            throw new ReadOnlyException(
+                "Modifier cache has been initialized, no additional modifiers may be registered");
+        }
         switch (runType)
         {
             case CustomRunType.Good:
@@ -28,6 +39,7 @@ public static class CustomRunManager
             case CustomRunType.Bad:
                 AdditionalBadModifiers.Add(typeof(T));
                 break;
+            case CustomRunType.None:
             default:
                 throw new ArgumentOutOfRangeException(nameof(runType), runType, null);
         }
@@ -35,6 +47,12 @@ public static class CustomRunManager
 
     internal static void RegisterInternal(CustomRunModifierModel modifier)
     {
+        if (IsLocked)
+        {
+            throw new ReadOnlyException(
+                "Modifier cache has been initialized, no additional modifiers may be registered");
+        }
+
         switch (modifier.RunType)
         {
             case CustomRunType.Good:
@@ -46,62 +64,76 @@ public static class CustomRunManager
             case CustomRunType.None:
                 break;
             default:
-                throw new ArgumentOutOfRangeException(nameof(modifier), modifier.RunType, null);
+                throw new ArgumentOutOfRangeException(nameof(modifier), modifier.RunType, "CustomRunType must be a valid value");
         }
     }
 
-    internal static IEnumerable<ModifierModel> GetGoodModifiers(IReadOnlyList<ModifierModel> baseGameModifiers)
+    internal static List<ModifierModel> GetGoodModifiers(IReadOnlyList<ModifierModel> baseGameModifiers)
     {
-        bool isBaseGameItterated = false;
-        foreach (ModifierModel m in AdditionalGoodModifiers.Select(t => ModelDb.GetById<ModifierModel>(ModelDb.GetId(t))))
-        {
-            if (m is not CustomRunModifierModel custom)
-            {
-                continue;
-            }
-
-            if (isBaseGameItterated || (int)custom.Info.Priority < 3)
-            {
-                yield return m;
-                continue;
-            }
-
-            foreach (ModifierModel baseModel in baseGameModifiers)
-            {
-                yield return baseModel;
-            }
-
-            isBaseGameItterated = true;
-
-            yield return m;
-        }
+        return GetModifiers(baseGameModifiers, AdditionalGoodModifiers);
     }
 
-    internal static IEnumerable<ModifierModel> GetBadModifiers(IReadOnlyList<ModifierModel> baseGameModifiers)
+    internal static List<ModifierModel> GetBadModifiers(IReadOnlyList<ModifierModel> baseGameModifiers)
     {
-        bool isBaseGameItterated = false;
-        foreach (ModifierModel m in AdditionalBadModifiers.Select(t => ModelDb.GetById<ModifierModel>(ModelDb.GetId(t))))
+        return GetModifiers(baseGameModifiers, AdditionalBadModifiers);
+    }
+
+    private static List<ModifierModel> GetModifiers(IReadOnlyList<ModifierModel> baseGameModifiers, HashSet<Type> additionalModifiers)
+    {
+        IsLocked = true;
+        List<ModifierModel> result = [];
+        IEnumerable<ModifierModel> legacy = [];
+        Dictionary<ModifierPriority, List<CustomRunModifierModel>> customs = [];
+
+        foreach (IGrouping<bool, ModifierModel> group in additionalModifiers.Select(ModelDb.GetModel<ModifierModel>)
+                     .GroupBy(modifier => modifier is CustomRunModifierModel))
         {
-            if (m is not CustomRunModifierModel custom)
+            if (!group.Key)
             {
-                continue;
+                legacy = group;
             }
 
-            if (isBaseGameItterated || custom.Info.Priority is not ModifierPriority.PostfixGeneric and ModifierPriority.PostfixSegmented)
-            {
-                yield return m;
-                continue;
-            }
-
-            foreach (ModifierModel baseModel in baseGameModifiers)
-            {
-                yield return baseModel;
-            }
-
-            isBaseGameItterated = true;
-
-            yield return m;
+            customs = group
+                .OfType<CustomRunModifierModel>()
+                .GroupBy(custom => custom.Info.Priority)
+                .OrderBy(subGroup => subGroup.Key)
+                .ToDictionary(g => g.Key, 
+                    g => g
+                        .OrderBy(c => c.Info.Primary)
+                        .ThenBy(c => c.Info.Secondary)
+                        .ToList());
         }
+
+        if (customs.TryGetValue(ModifierPriority.Immediate, out List<CustomRunModifierModel>? list1))
+        {
+            result.AddRange(list1);
+        }
+
+        if (customs.TryGetValue(ModifierPriority.PrefixSegmented, out List<CustomRunModifierModel>? list2))
+        {
+            result.AddRange(list2);
+        }
+
+        if (customs.TryGetValue(ModifierPriority.PrefixGeneric, out List<CustomRunModifierModel>? list3))
+        {
+            result.AddRange(list3);
+        }
+
+        result.AddRange(baseGameModifiers);
+
+        if (customs.TryGetValue(ModifierPriority.PostfixSegmented, out List<CustomRunModifierModel>? list4))
+        {
+            result.AddRange(list4);
+        }
+
+        if (customs.TryGetValue(ModifierPriority.PostfixGeneric, out List<CustomRunModifierModel>? list5))
+        {
+            result.AddRange(list5);
+        }
+
+        result.AddRange(legacy);
+
+        return result;
     }
 }
 

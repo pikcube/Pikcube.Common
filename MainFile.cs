@@ -58,17 +58,7 @@ public partial class MainFile : Node
                      .ThenBy(modifier => modifier.Info.Primary)
                      .ThenBy(modifier => modifier.Info.Secondary))
         {
-            switch (modifier.RunType)
-            {
-                case CustomRunType.None:
-                    break;
-                case CustomRunType.Good:
-                case CustomRunType.Bad:
-                    CustomRunManager.RegisterInternal(modifier);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            CustomRunManager.RegisterInternal(modifier);
         }
     }
 

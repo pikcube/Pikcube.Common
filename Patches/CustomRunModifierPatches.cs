@@ -19,7 +19,7 @@ internal static class CustomRunModifierPatches
             {
                 return _cached;
             }
-            List<ModifierModel> allGood = [.. CustomRunManager.GetGoodModifiers(__result)];
+            List<ModifierModel> allGood = CustomRunManager.GetGoodModifiers(__result);
             _cached = allGood.AsReadOnly();
 
             return _cached;
@@ -37,7 +37,7 @@ internal static class CustomRunModifierPatches
             {
                 return _cached;
             }
-            List<ModifierModel> allBad = [.. CustomRunManager.GetBadModifiers(__result)];
+            List<ModifierModel> allBad = CustomRunManager.GetBadModifiers(__result);
 
             _cached = allBad.AsReadOnly();
             return _cached;
