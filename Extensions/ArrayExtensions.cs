@@ -1,4 +1,4 @@
-﻿namespace Pikcube.Common.Utility;
+﻿namespace Pikcube.Common.Extensions;
 
 /// <summary>
 /// Defines an extension block for extension methods on the IList interface

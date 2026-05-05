@@ -4,7 +4,7 @@ using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Saves.Runs;
 
-namespace Pikcube.Common.Utility;
+namespace Pikcube.Common.Extensions;
 
 /// <summary>
 /// Defines an extension block that adds methods to SerializableCards

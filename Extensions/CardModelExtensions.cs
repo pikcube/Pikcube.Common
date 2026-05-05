@@ -1,7 +1,7 @@
 ﻿using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Models;
 
-namespace Pikcube.Common.Utility;
+namespace Pikcube.Common.Extensions;
 
 /// <summary>
 /// Defines an extension block that adds additional methods to all types that implement CardModel

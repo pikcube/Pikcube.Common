@@ -4,7 +4,7 @@ using HarmonyLib;
 using MegaCrit.Sts2.Core.Rewards;
 using MegaCrit.Sts2.Core.Runs;
 
-namespace Pikcube.Common.Utility;
+namespace Pikcube.Common.Extensions;
 
 /// <summary>
 /// Defines an extension block that adds additional methods to CardReward

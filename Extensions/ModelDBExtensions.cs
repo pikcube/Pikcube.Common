@@ -1,6 +1,6 @@
 ﻿using MegaCrit.Sts2.Core.Models;
 
-namespace Pikcube.Common.Utility;
+namespace Pikcube.Common.Extensions;
 
 /// <summary>
 /// Extension on ModelDB

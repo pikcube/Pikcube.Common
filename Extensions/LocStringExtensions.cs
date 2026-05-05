@@ -1,22 +1,13 @@
 ﻿using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models.Cards;
 
-namespace Pikcube.Common.Utility;
+namespace Pikcube.Common.Extensions;
 
 /// <summary>
-/// Extensions on the LocString class and LocManager class
+/// Extensions on the LocString class
 /// </summary>
 public static class LocStringExtensions
-{ 
-    private static LocManager GetInvariant()
-    {
-        LocManager manager = new();
-        manager.SetLanguage("eng");
-        return manager;
-    }
-
-    private static readonly LocManager Invariant = GetInvariant();
-
+{
     extension(LocString locString)
     {
         /// <summary>
@@ -27,13 +18,5 @@ public static class LocStringExtensions
         {
             return LocManager.Invariant.GetTable(locString.LocTable).GetRawText(locString.LocEntryKey);
         }
-    }
-
-    extension(LocManager locManager)
-    {
-        /// <summary>
-        /// Get an english localication manager.
-        /// </summary>
-        public static LocManager Invariant => Invariant;
     }
 }
