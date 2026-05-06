@@ -1,5 +1,6 @@
 ﻿using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Hooks;
+using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves;
@@ -71,6 +72,35 @@ public static class BetterHooks
             listener.AfterCreatingNewRun(runState, players, acts, modifiers, gameMode, ascensionLevel, seed);
         }
     }
+
+    /// <summary>
+    /// Defines a void method that acccept a card model and a HoverTipEventArgs.
+    /// </summary>
+    public delegate void ModifyCardHoverTipsHandler(CardModel sender, HoverTipEventArgs e);
+
+    /// <summary>
+    /// Invoked immediately after getting the hover tips for a card. Modify HoverTipEventArgs.NewHovetTips to change the return value.
+    /// </summary>
+    public static event ModifyCardHoverTipsHandler? ModifyCardHoverTips;
+
+    internal static IEnumerable<IHoverTip> OnModifyCardHoverTips(CardModel cardModel, IEnumerable<IHoverTip> original)
+    {
+        IModifyHoverTipsListener[] listeners = cardModel.RunState?.IterateHookListeners(cardModel.CombatState).OfType<IModifyHoverTipsListener>().ToArray() ?? [];
+        if (ModifyCardHoverTips is null && listeners.Length == 0)
+        {
+            return original;
+        }
+
+        HoverTipEventArgs args = new(original.ToArray().AsReadOnly());
+        ModifyCardHoverTips?.Invoke(cardModel, args);
+        foreach (IModifyHoverTipsListener listener in listeners)
+        {
+            listener.ModifyCardHoverTips(cardModel, args);
+        }
+
+        return args.NewHoverTips;
+    }
+
 
     /// <summary>
     /// Defines a named void method

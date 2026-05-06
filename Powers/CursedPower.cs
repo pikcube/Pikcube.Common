@@ -13,10 +13,13 @@ using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Nodes;
-using MegaCrit.Sts2.Core.Nodes.Vfx;
 using MegaCrit.Sts2.Core.Nodes.Cards;
 using MegaCrit.Sts2.Core.Nodes.Rooms;
+using MegaCrit.Sts2.Core.Nodes.Vfx;
+using MegaCrit.Sts2.Core.Rewards;
 using MegaCrit.Sts2.Core.Runs;
+using MegaCrit.Sts2.Core.Saves;
+using MegaCrit.Sts2.Core.Saves.Managers;
 using Pikcube.Common.Keywords;
 using Pikcube.Common.Vfx;
 
@@ -28,8 +31,8 @@ namespace Pikcube.Common.Powers;
 /// Cards that aren't played are always sent to the discard pile and still expend their energy cost.
 /// </summary>
 [UsedImplicitly]
-public class Cursed : CustomPowerModel
-{
+public class CursedPower : CustomPowerModel
+{ 
     /// <inheritdoc />
     public override PowerType Type => PowerType.Debuff;
 
@@ -44,9 +47,11 @@ public class Cursed : CustomPowerModel
     /// <inheritdoc />
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        new HoverTip(new LocString(locTable, "PIKCUBE-CURSED.blinkTitle"),
-            new LocString(locTable, "PIKCUBE-CURSED.blinkDescription"))
+        BlinkTip
     ];
+
+    internal static readonly IHoverTip BlinkTip = new HoverTip(new LocString(locTable, "PIKCUBE-CURSED_POWER.blinkTitle"),
+        new LocString(locTable, "PIKCUBE-CURSED_POWER.blinkDescription"));
 
     /// <inheritdoc />
     protected override void AfterCloned()
@@ -76,10 +81,17 @@ public class Cursed : CustomPowerModel
             return;
         }
 
+        ValidCards.Clear();
+
         ValidCards.AddRange(owningPlayerPlayerCombatState.DrawPile.Cards);
         ValidCards.AddRange(owningPlayerPlayerCombatState.Hand.Cards);
         ValidCards.AddRange(owningPlayerPlayerCombatState.DiscardPile.Cards);
         ValidCards.AddRange(owningPlayerPlayerCombatState.PlayPile.Cards);
+
+        foreach (CardModel card in ValidCards)
+        {
+            card.AddKeyword(CursedModel.Cursed);
+        }
     }
 
     /// <inheritdoc />
@@ -103,7 +115,7 @@ public class Cursed : CustomPowerModel
         }
         bool isIgnored = IgnoredCards.Remove(card);
 
-        if (isIgnored || !ValidCards.Contains(card) || card.Owner != OwningPlayer || card.IsDupe || card.Affliction is not null || OwningPlayer.RunState.Rng.CombatCardSelection.NextBool() is not true)
+        if (isIgnored || !ValidCards.Contains(card) || card.Keywords.All(c => c != CursedModel.Cursed) || card.Owner != OwningPlayer || card.IsDupe || OwningPlayer.RunState.Rng.CombatCardSelection.NextBool() is not true)
         {
             return playCount;
         }
@@ -129,10 +141,12 @@ public class Cursed : CustomPowerModel
             if (OwningPlayer == card.Owner && NGame.Instance is not null)
             {
                 AudioStream curseSound = GD.Load<AudioStream>("res://Pikcube.Common/curse.ogg");
+                SettingsSave settings = SaveManager.Instance.SettingsSave;
                 AudioStreamPlayer player = new()
                 {
                     Stream = curseSound,
-                    VolumeDb = 3f
+                    VolumeDb = 3f,
+                    VolumeLinear = settings.VolumeSfx * settings.VolumeMaster
                 };
                 NGame.Instance.AddChild(player);
                 player.Play();
@@ -172,6 +186,10 @@ public class Cursed : CustomPowerModel
     /// <inheritdoc />
     public override Task AfterRemoved(Creature oldOwner)
     {
+        foreach (CardModel card in ValidCards)
+        {
+            card.RemoveKeyword(CursedModel.Cursed);
+        }
         if (OwningPlayer is null)
         {
             return Task.CompletedTask;
