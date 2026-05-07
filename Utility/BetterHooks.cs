@@ -2,6 +2,7 @@
 using MegaCrit.Sts2.Core.Hooks;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Nodes.Screens.CardSelection;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves;
 
@@ -115,5 +116,24 @@ public static class BetterHooks
     internal static void OnOneTimeInitializationFinished()
     {
         AfterOneTimeInitialization?.Invoke();
+    }
+
+    /// <summary>
+    /// Defines a named void method that accepts a NChooseACardSelectionScreen and a ModifyCardSelectionScreenTitleArgs
+    /// </summary>
+    public delegate void ModifyCardSelectionScreenTitleHandler(NChooseACardSelectionScreen sender, ModifyCardSelectionScreenTitleArgs e);
+
+    /// <summary>
+    /// Triggered immediately before showing a card selection screen to the player, allowing you to modify the text on the banner.
+    /// </summary>
+    public static event ModifyCardSelectionScreenTitleHandler? ModifyCardSelectionScreenTitle;
+
+
+    internal static string OnModifyCardSelectionScreenTitle(NChooseACardSelectionScreen nChooseACardSelectionScreen, string defaultText)
+    {
+        ModifyCardSelectionScreenTitleArgs args = new(defaultText);
+        ModifyCardSelectionScreenTitle?.Invoke(nChooseACardSelectionScreen, args);
+
+        return args.NewText;
     }
 }
