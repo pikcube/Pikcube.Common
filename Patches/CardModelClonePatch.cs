@@ -1,0 +1,45 @@
+﻿using HarmonyLib;
+using MegaCrit.Sts2.Core.Models;
+using System.Reflection;
+using Pikcube.Common.Utility;
+
+namespace Pikcube.Common.Patches;
+
+[HarmonyPatch]
+internal static class CardModelClonePatch
+{
+    static IEnumerable<MethodBase> TargetMethods()
+    {
+        MethodInfo? onPlayMethod = typeof(CardModel).GetMethod(nameof(CardModel.MutableClone));
+        if (onPlayMethod is not null)
+        {
+            yield return onPlayMethod;
+        }
+
+        foreach (Type? type in AccessTools.AllTypes()
+                     .Where(t => t.IsSubclassOf(typeof(CardModel)) && !t.IsAbstract))
+        {
+            MethodInfo? method = type.GetMethod(nameof(CardModel.MutableClone),
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+            if (method != null && method.DeclaringType != typeof(CardModel))
+            {
+                yield return method;
+            }
+        }
+    }
+
+    internal static void Postfix(AbstractModel __result, AbstractModel __instance)
+    {
+        if (__instance is not CardModel || __result is not CardModel)
+        {
+            return;
+        }
+
+        CardModel original = (CardModel)__instance;
+        CardModel card = (CardModel)__result;
+
+        BetterHooks.OnCardCloned(original, card);
+    }
+
+}

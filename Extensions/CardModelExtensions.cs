@@ -1,5 +1,9 @@
-﻿using MegaCrit.Sts2.Core.Entities.Players;
+﻿using System.Numerics;
+using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Nodes.GodotExtensions;
+using Pikcube.Common.Utility;
 
 namespace Pikcube.Common.Extensions;
 
@@ -37,6 +41,15 @@ public static class CardModelExtensions
         public T CreateNewInstance(Player player)
         {
             return (T)player.RunState.CreateCard(instance.CanonicalInstance, player);
+        }
+
+        /// <summary>
+        /// Add a Keyword to this card until the start of next turn.
+        /// </summary>
+        /// <param name="keyword">The keyword to temporarily add</param>
+        public void AddTempKeyword(CardKeyword keyword, object? source = null)
+        {
+            TempKeywordManager.Register(instance, keyword, source);
         }
     }
 }

@@ -2,6 +2,7 @@
 using MegaCrit.Sts2.Core.Hooks;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Nodes.Screens.CardSelection;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves;
@@ -135,5 +136,20 @@ public static class BetterHooks
         ModifyCardSelectionScreenTitle?.Invoke(nChooseACardSelectionScreen, args);
 
         return args.NewText;
+    }
+
+    /// <summary>
+    /// Defines a named void method that accepts two Card Models as an argument.
+    /// </summary>
+    public delegate void CardClonedEventHandler(CardModel original, CardModel clone);
+
+    /// <summary>
+    /// Invoked immediately after a CardModel is duplicated
+    /// </summary>
+    public static event CardClonedEventHandler? AfterCardCloned;
+
+    internal static void OnCardCloned(CardModel original, CardModel clone)
+    {
+        AfterCardCloned?.Invoke(original, clone);
     }
 }

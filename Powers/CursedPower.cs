@@ -20,7 +20,9 @@ using MegaCrit.Sts2.Core.Rewards;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves;
 using MegaCrit.Sts2.Core.Saves.Managers;
+using Pikcube.Common.Extensions;
 using Pikcube.Common.Keywords;
+using Pikcube.Common.Utility;
 using Pikcube.Common.Vfx;
 
 namespace Pikcube.Common.Powers;
@@ -90,7 +92,7 @@ public class CursedPower : CustomPowerModel
 
         foreach (CardModel card in ValidCards)
         {
-            card.AddKeyword(CursedModel.Cursed);
+            card.AddTempKeyword(CursedModel.Cursed, this);
         }
     }
 
@@ -186,10 +188,7 @@ public class CursedPower : CustomPowerModel
     /// <inheritdoc />
     public override Task AfterRemoved(Creature oldOwner)
     {
-        foreach (CardModel card in ValidCards)
-        {
-            card.RemoveKeyword(CursedModel.Cursed);
-        }
+        TempKeywordManager.DestroyKeywordsEarly(this);
         if (OwningPlayer is null)
         {
             return Task.CompletedTask;
