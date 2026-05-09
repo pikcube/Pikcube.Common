@@ -21,5 +21,8 @@ public abstract class CustomRunModifierModel(CustomRunType runType, CustomRunMod
     /// </summary>
     /// <param name="innerPath">The path relivive to your mod id directory</param>
     /// <returns>The resolved path into the pck</returns>
-    public abstract string GetImagePath(string innerPath);
+    protected virtual string GetImagePath(string innerPath)
+    {
+        return $"res://{Info.ModId}/images/{innerPath.TrimStart('/')}";
+    }
 }

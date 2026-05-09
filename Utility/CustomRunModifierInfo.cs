@@ -20,7 +20,7 @@ public record CustomRunModifierInfo
     /// <summary>
     /// The id of the mod this modifier came from.
     /// </summary>
-    private string ModId { get; }
+    internal string ModId { get; }
     /// <summary>
     /// The name of the modifier to use when sorting.
     /// </summary>
