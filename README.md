@@ -38,7 +38,7 @@ An API that allows for adding custom runs to the Custom Run list. Entries are ap
 Adding a run modifier is as easy as creating a class that inherits from `CustomRunModifierModel`
 
 ```cs
-public class PraiseSnecko() : CustomRunModifierModel(CustomRunType.Good, new CustomRunModifierInfo(MainFile.ModId, "Praise Snecko")
+public class PraiseSnecko() : CustomRunModifierModel(CustomRunType.Good, new CustomRunModifierInfo(MainFile.ModId, "Praise Snecko"))
 ```
 
 Your custom run modifier needs to pass in whether this modifier is Green (CustomRunType.Good) or Red (CustomRunType.Bad), along with an instance of CustomRunModifierInfo.
