@@ -67,7 +67,13 @@
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>Pikcube Common StS2 Code</Title>
 		<Authors>Pikcube</Authors>
-		<GenerateDocumentationFile>True</GenerateDocumentationFile> 
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<PackageProjectUrl>https://github.com/pikcube/Pikcube.Common</PackageProjectUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/pikcube/Pikcube.Common</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<IncludeSymbols>True</IncludeSymbols> 
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ExportRelease|AnyCPU'">
@@ -105,10 +111,18 @@
 	<ItemGroup>
 		<None Include=".editorconfig" />
 		<None Include=".gitignore" />
+		<None Include="LICENSE">
+		  <Pack>True</Pack>
+		  <PackagePath>\</PackagePath>
+		</None>
 		<None Include="Pikcube.Common.json">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Include="project.godot" />
+		<None Include="README.md">
+		  <Pack>True</Pack>
+		  <PackagePath>\</PackagePath>
+		</None>
 		<None Include="Pikcube.Common/**" />
 	</ItemGroup>
 
