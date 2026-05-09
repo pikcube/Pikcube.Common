@@ -46,6 +46,11 @@ public class TempKeywordManager() : CustomSingletonModel(true, true)
         CurrentTempKeywords.Clear();
     }
 
+    internal static void DestroyKeywordsEarly<T>(T instance, CardKeyword keyword) where T : CardModel
+    {
+        CurrentTempKeywords.RemoveAll(trio => trio.Item1 == instance && trio.Item2 == keyword);
+    }
+
 
     private static List<(CardModel, CardKeyword, object?)> CurrentTempKeywords { get; } = [];
 
@@ -73,7 +78,7 @@ public class TempKeywordManager() : CustomSingletonModel(true, true)
 
     private static void Clear()
     {
-        foreach ((CardModel cardModel, CardKeyword cardKeyword, object source) in CurrentTempKeywords)
+        foreach ((CardModel cardModel, CardKeyword cardKeyword, object? _) in CurrentTempKeywords)
         {
             cardModel.RemoveKeyword(cardKeyword);
         }

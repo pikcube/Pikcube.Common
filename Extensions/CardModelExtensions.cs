@@ -47,9 +47,19 @@ public static class CardModelExtensions
         /// Add a Keyword to this card until the start of next turn.
         /// </summary>
         /// <param name="keyword">The keyword to temporarily add</param>
+        /// <param name="source">Optional: The object registering the keyword. Allows for early destruction by calling DestroyKeywordsEarly</param>
         public void AddTempKeyword(CardKeyword keyword, object? source = null)
         {
             TempKeywordManager.Register(instance, keyword, source);
+        }
+
+        /// <summary>
+        /// Remove a Keyword prematurely.
+        /// </summary>
+        /// <param name="keyword">The keyword to remove.</param>
+        public void RemoveTempKeywordEarly(CardKeyword keyword)
+        {
+            TempKeywordManager.DestroyKeywordsEarly(instance, keyword);
         }
     }
 }
