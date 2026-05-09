@@ -35,17 +35,21 @@ Registration uses the type itself instead of the canonical instance as a key, so
 
 An API that allows for adding custom runs to the Custom Run list. Entries are appended after the base game runs.
 
-Adding a run modifier is as easy as calling CustomRunManager.Register
+Adding a run modifier is as easy as creating a class that inherits from `CustomRunModifierModel`
 
 ```cs
-CustomRunManager.Register<PraiseSnecko>(CustomRunType.Good); //Adds a run modifier that starts you with Snecko Eye
+public class PraiseSnecko() : CustomRunModifierModel(CustomRunType.Good, new CustomRunModifierInfo(MainFile.ModId, "Praise Snecko")
 ```
 
-The CustomRunType defines whether the modifier will be in the good list (colored green) or the red list (colored red).
+Your custom run modifier needs to pass in whether this modifier is Green (CustomRunType.Good) or Red (CustomRunType.Bad), along with an instance of CustomRunModifierInfo.
 
-```cs
-CustomRunManager.Register<PeakGaming>(CustomRunType.Bad); // Adds a run modifier that duplicates your starting deck and starts you with Bing Bong
-```
+Your ModId can be passed manually, but if you are using a BaseLib tempalte it'll be found in MainFile.ModId, along with the name of your modifier (for sorting purposes).
+
+You can also define a sort priority to set whether your modifier comes before the base game modifiers (`ModifierPriority.PrefixGeneric`) or after (`ModifierPriority.PostfixGeneric`).
+
+You can also use `ModifierPriority.PrefixSegmented` and `ModifierPriority.PostfixSegmented` if you prefer your modifiers to all be grouped together (instead of being mixed in with all custom modifiers).
+
+There is also a special Priority of `ModifierPriority.Immediate` which is for modifiers that belong at the very top of the list. This is intended for modifiers that are essencially customization options (such as a "Always Whale" modifier to start with standard Neow Options, or "The Ending" to enable Act 4 (once it comes out).
 
 ## Feature: An implementation of the Cursed Debuff from Dicey Dungeons
 
