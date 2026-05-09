@@ -41,11 +41,11 @@ Adding a run modifier is as easy as creating a class that inherits from `CustomR
 public class PraiseSnecko() : CustomRunModifierModel(CustomRunType.Good, new CustomRunModifierInfo(MainFile.ModId, "Praise Snecko"))
 ```
 
-Your custom run modifier needs to pass in whether this modifier is Green (CustomRunType.Good) or Red (CustomRunType.Bad), along with an instance of CustomRunModifierInfo.
+Your custom run modifier needs to pass in whether this modifier is Green (`CustomRunType.Good`) or Red (`CustomRunType.Bad`), along with an instance of `CustomRunModifierInfo`.
 
-Your ModId can be passed manually, but if you are using a BaseLib tempalte it'll be found in MainFile.ModId, along with the name of your modifier (for sorting purposes).
+Your ModId can be passed to the `CustomRunModifierInfo` manually, but if you are using a BaseLib template it'll be found in MainFile.ModId. You will also need to pass the name of your modifier (for sorting purposes).
 
-You can also define a sort priority to set whether your modifier comes before the base game modifiers (`ModifierPriority.PrefixGeneric`) or after (`ModifierPriority.PostfixGeneric`).
+You can optionally define a sort priority to set whether your modifier comes before the base game modifiers (`ModifierPriority.PrefixGeneric`) or after (`ModifierPriority.PostfixGeneric`). `ModifierPriority.PostfixGeneric` is the default. Modifiers will be sorted alphabetically by the name in your modifier info.
 
 You can also use `ModifierPriority.PrefixSegmented` and `ModifierPriority.PostfixSegmented` if you prefer your modifiers to all be grouped together (instead of being mixed in with all custom modifiers).
 
