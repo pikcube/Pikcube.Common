@@ -67,7 +67,7 @@ I love extension methods and I add them for nearly everything. Examples include
 
 ## How To Use as a Developer
 
-You can easilly download this from [NuGet](https://www.nuget.org/packages/Pikcube.Common/) as "Pikcube.Common" using your package manager.
+You can easilly download this from [NuGet](https://www.nuget.org/packages/Pikcube.Common/) as "Pikcube.Common" using your IDE's package manager.
 
 Alternatively, add this line to your `.csproj` file
 
