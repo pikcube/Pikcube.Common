@@ -49,7 +49,7 @@ You can optionally define a sort priority to set whether your modifier comes bef
 
 You can also use `ModifierPriority.PrefixSegmented` and `ModifierPriority.PostfixSegmented` if you prefer your modifiers to all be grouped together (instead of being mixed in with all custom modifiers).
 
-There is also a special Priority of `ModifierPriority.Immediate` which is for modifiers that belong at the very top of the list. This is intended for modifiers that are essencially customization options (such as a "Always Whale" modifier to start with standard Neow Options, or "The Ending" to enable Act 4 (once it comes out).
+There is also a special priority of `ModifierPriority.Immediate` which is for modifiers that belong at the very top of the list. This is intended for modifiers that are essencially customization options (such as a "Always Whale" modifier to start with standard Neow Options, or "The Ending" to enable Act 4 (once it comes out).
 
 ## Feature: An implementation of the Cursed Debuff from Dicey Dungeons
 
