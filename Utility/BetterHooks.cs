@@ -1,4 +1,5 @@
-﻿using MegaCrit.Sts2.Core.Entities.Players;
+﻿using MegaCrit.Sts2.Core.Entities.Merchant;
+using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Hooks;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
@@ -151,5 +152,50 @@ public static class BetterHooks
     internal static void OnCardCloned(CardModel original, CardModel clone)
     {
         AfterCardCloned?.Invoke(original, clone);
+    }
+
+    /// <summary>
+    /// Defines a named void method that accepts a Merchant Potion Entry and MerchantPotionBlacklistArgs
+    /// </summary>
+    public delegate void ModifyMerchantPotionBlacklistHandler(MerchantPotionEntry entry, MerchantPotionBlacklistArgs e);
+
+    /// <summary>
+    /// Event invoked immediately before generating potions for the merchant
+    /// </summary>
+    public static event ModifyMerchantPotionBlacklistHandler? ModifyMerchantPotionBlacklist;
+
+    internal static IEnumerable<PotionModel> OnModifyMerchantPotionBlacklist(MerchantPotionEntry entry, IEnumerable<PotionModel> blacklist, Player player)
+    {
+        MerchantPotionBlacklistArgs args = new(player, [.. blacklist]);
+        ModifyMerchantPotionBlacklist?.Invoke(entry, args);
+        foreach (IModifyMerchantPotionBlacklist listener in player.RunState.IterateHookListeners(null).OfType<IModifyMerchantPotionBlacklist>())
+        {
+            listener.ModifyMerchantPotionBlacklist(entry, args);
+        }
+
+        return args.NewBlacklist;
+    }
+
+    /// <summary>
+    /// Defines a named void method that accepts a MerchantPotionEntry and ModifyMerchantPotionResultArgs.
+    /// </summary>
+    public delegate void ModifyMerchantPotionResultHandler(MerchantPotionEntry entry, ModifyMerchantPotionResultArgs args);
+
+    /// <summary>
+    /// Invoked immediately after the merchant shop entry is filled with a potion.
+    /// </summary>
+    public static event ModifyMerchantPotionResultHandler? ModifyMerchantPotionResult;
+
+    internal static PotionModel? OnModifyMerchantPotionResult(MerchantPotionEntry entry, PotionModel? model, Player player)
+    {
+        ModifyMerchantPotionResultArgs args = new(model);
+        ModifyMerchantPotionResult?.Invoke(entry, args);
+
+        foreach (IModifyMerchantPotionResult listener in player.RunState.IterateHookListeners(null).OfType<IModifyMerchantPotionResult>())
+        {
+            listener.ModifyMerchantPotionResult(entry, args);
+        }
+
+        return args.NewPotion;
     }
 }
