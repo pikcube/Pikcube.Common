@@ -14,10 +14,24 @@ internal static class MerchantPotionEntryPatches
     {
         blacklist = BetterHooks.OnModifyMerchantPotionBlacklist(__instance, blacklist, ____player);
     }
+}
 
-    internal static void Postfix(MerchantPotionEntry __instance, Player ____player)
+[HarmonyPatch(typeof(MerchantPotionEntry), MethodType.Constructor, typeof(Player))]
+internal static class MerchantPointEntryCtorPatches1
+{
+    internal static void Postfix(MerchantPotionEntry __instance, Player player)
     {
-        PropertyInfo modelProperty = AccessTools.DeclaredProperty(nameof(MerchantPotionEntry.Model));
-        modelProperty.SetValue(__instance, BetterHooks.OnModifyMerchantPotionResult(__instance, __instance.Model, ____player));
+        PropertyInfo modelProperty = AccessTools.DeclaredProperty(typeof(MerchantPotionEntry), nameof(MerchantPotionEntry.Model));
+        modelProperty.SetValue(__instance, BetterHooks.OnModifyMerchantPotionResult(__instance, __instance.Model, player));
+    }
+}
+
+[HarmonyPatch(typeof(MerchantPotionEntry), MethodType.Constructor, typeof(PotionModel), typeof(Player))]
+internal static class MerchantPointEntryCtorPatches2
+{
+    internal static void Postfix(MerchantPotionEntry __instance, Player player)
+    {
+        PropertyInfo modelProperty = AccessTools.DeclaredProperty(typeof(MerchantPotionEntry), nameof(MerchantPotionEntry.Model));
+        modelProperty.SetValue(__instance, BetterHooks.OnModifyMerchantPotionResult(__instance, __instance.Model, player));
     }
 }
