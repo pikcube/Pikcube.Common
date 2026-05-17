@@ -67,7 +67,7 @@ public class BlinkModel() : CustomSingletonModel(true, false)
                 tasks.Add(CardPileCmd.Add(c, PileType.Draw, CardPilePosition.Top));
             }
         }
-        tasks.Add(Task.Delay(TimeSpan.FromSeconds(0.7)));
+        tasks.Add(Task.Delay(TimeSpan.FromSeconds(0.2)));
         await Task.WhenAll(tasks);
 
     }
