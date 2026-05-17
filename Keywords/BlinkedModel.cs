@@ -28,13 +28,16 @@ public class BlinkedModel() : CustomSingletonModel(true, false)
         }
 
         List<CardModel> blinkCards = [.. player.PlayerCombatState.AllCards.Where(c => c.Keywords.Contains(Blinked))];
+        List<Task> tasks = [];
         foreach (CardModel card in blinkCards)
         {
             card.RemoveKeyword(Blinked);
             if (card.Pile?.Type != PileType.Hand)
             {
-                await CardPileCmd.Add(card, PileType.Hand);
+                tasks.Add(CardPileCmd.Add(card, PileType.Hand));
             }
         }
+        tasks.Add(Task.Delay(TimeSpan.FromSeconds(0.15)));
+        await Task.WhenAll(tasks);
     }
 }

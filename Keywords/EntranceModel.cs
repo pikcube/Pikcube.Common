@@ -58,14 +58,16 @@ public class EntranceModel() : CustomSingletonModel(true, false)
 
         CardModel[] cards = [.. player.PlayerCombatState.AllCards.Where(c => EntranceCardsToRestore.Contains(c))];
 
+        List<Task> tasks = [];
         foreach(CardModel c in cards)
         {
             EntranceCardsToRestore.Remove(c);
             if (c.Pile == player.PlayerCombatState.ExhaustPile)
             {
-                await CardPileCmd.Add(c, PileType.Draw, CardPilePosition.Top);
+                tasks.Add(CardPileCmd.Add(c, PileType.Draw, CardPilePosition.Top));
             }
         }
+        await Task.WhenAll(tasks);
 
     }
 }

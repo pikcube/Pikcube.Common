@@ -29,22 +29,19 @@ public class BlinkModel() : CustomSingletonModel(true, false)
         return Task.CompletedTask;
     }
 
-    /// <summary>
-    /// Exhaust target card, at the end of this turn, move it from your exhaust pile to the top of your draw pile.
-    /// </summary>
-    /// <param name="choiceContext">The current player choice context.</param>
-    /// <param name="card">The card to blink.</param>
-    public static async Task BlinkCardAsync(PlayerChoiceContext choiceContext, CardModel card)
+    /// <inheritdoc />
+    public override (PileType, CardPilePosition) ModifyCardPlayResultPileTypeAndPosition(CardModel card,
+        bool isAutoPlay,
+        ResourceInfo resources, PileType pileType, CardPilePosition position)
     {
-        await CardCmd.Exhaust(choiceContext, card);
-        if (card.Keywords.Contains(Blink))
+        if (!card.Keywords.Contains(Blink))
         {
-            BlinkCardsToRestore.Add(card);
+            return (pileType, position);
         }
-        else
-        {
-            card.AddKeyword(BlinkedModel.Blinked);
-        }
+
+        BlinkCardsToRestore.Add(card);
+        return (PileType.Exhaust, CardPilePosition.Top);
+
     }
 
     /// <inheritdoc/>
@@ -67,8 +64,25 @@ public class BlinkModel() : CustomSingletonModel(true, false)
                 tasks.Add(CardPileCmd.Add(c, PileType.Draw, CardPilePosition.Top));
             }
         }
-        tasks.Add(Task.Delay(TimeSpan.FromSeconds(0.2)));
+        tasks.Add(Task.Delay(TimeSpan.FromSeconds(0.15)));
         await Task.WhenAll(tasks);
+    }
 
+    /// <summary>
+    /// Exhaust target card, at the end of this turn, move it from your exhaust pile to the top of your draw pile.
+    /// </summary>
+    /// <param name="choiceContext">The current player choice context.</param>
+    /// <param name="card">The card to blink.</param>
+    public static async Task BlinkCardAsync(PlayerChoiceContext choiceContext, CardModel card)
+    {
+        await CardCmd.Exhaust(choiceContext, card);
+        if (card.Keywords.Contains(Blink))
+        {
+            BlinkCardsToRestore.Add(card);
+        }
+        else
+        {
+            card.AddKeyword(BlinkedModel.Blinked);
+        }
     }
 }

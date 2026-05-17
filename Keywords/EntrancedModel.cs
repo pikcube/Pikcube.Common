@@ -42,7 +42,6 @@ public class EntrancedModel() : CustomSingletonModel(true, false)
                 tasks.Add(CardPileCmd.Add(card, PileType.Draw, CardPilePosition.Top));
             }
         }
-        tasks.Add(Task.Delay(TimeSpan.FromSeconds(0.2)));
         await Task.WhenAll(tasks);
     }
 }
