@@ -33,13 +33,16 @@ public class EntrancedModel() : CustomSingletonModel(true, false)
         }
 
         List<CardModel> entrancedCards = [.. player.PlayerCombatState.AllCards.Where(c => c.Keywords.Contains(Entranced))];
+        List<Task> tasks = [];
         foreach (CardModel card in entrancedCards)
         {
             card.RemoveKeyword(Entranced);
             if (card.Pile?.Type != PileType.Draw)
             {
-                await CardPileCmd.Add(card, PileType.Draw, CardPilePosition.Top);
+                tasks.Add(CardPileCmd.Add(card, PileType.Draw, CardPilePosition.Top));
             }
         }
+        tasks.Add(Task.Delay(TimeSpan.FromSeconds(0.7)));
+        await Task.WhenAll(tasks);
     }
 }

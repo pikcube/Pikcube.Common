@@ -57,14 +57,18 @@ public class BlinkModel() : CustomSingletonModel(true, false)
 
         CardModel[] cards = [.. player.PlayerCombatState.AllCards.Where(c => BlinkCardsToRestore.Contains(c))];
 
+        List<Task> tasks = [];
+
         foreach (CardModel c in cards)
         {
             BlinkCardsToRestore.Remove(c);
             if (c.Pile == player.PlayerCombatState.ExhaustPile)
             {
-                await CardPileCmd.Add(c, PileType.Draw, CardPilePosition.Top);
+                tasks.Add(CardPileCmd.Add(c, PileType.Draw, CardPilePosition.Top));
             }
         }
+        tasks.Add(Task.Delay(TimeSpan.FromSeconds(0.7)));
+        await Task.WhenAll(tasks);
 
     }
 }
