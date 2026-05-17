@@ -1,31 +1,32 @@
 ﻿using BaseLib.Abstracts;
 using BaseLib.Patches.Content;
+using JetBrains.Annotations;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
-using MegaCrit.Sts2.Core.Models.Cards;
 
 namespace Pikcube.Common.Keywords;
 
 /// <summary>
-/// Exhaust this card. At the end of the turn, return this card to your hand.
+/// Exhaust target card, at the end of this turn, place it on top of your draw pile.
 /// </summary>
-public class BlinkModel() : CustomSingletonModel(true, false)
+[UsedImplicitly]
+public class EntranceModel() : CustomSingletonModel(true, false)
 {
     /// <summary>
-    /// Exhaust this card. At the end of the turn, return this card to your hand.
+    /// Exhaust target card, at the end of this turn, place it on top of your draw pile.
     /// </summary>
     [CustomEnum, KeywordProperties(AutoKeywordPosition.After)]
-    public static CardKeyword Blink = 0;
+    public static CardKeyword Entrance = 0;
 
-    private static readonly HashSet<CardModel> BlinkCardsToRestore = [];
+    private static readonly HashSet<CardModel> EntranceCardsToRestore = [];
 
     /// <inheritdoc />
     public override Task BeforeCombatStart()
     {
-        BlinkCardsToRestore.Clear();
+        EntranceCardsToRestore.Clear();
         return Task.CompletedTask;
     }
 
@@ -33,17 +34,17 @@ public class BlinkModel() : CustomSingletonModel(true, false)
     /// Exhaust target card, at the end of this turn, move it from your exhaust pile to the top of your draw pile.
     /// </summary>
     /// <param name="choiceContext">The current player choice context.</param>
-    /// <param name="card">The card to blink.</param>
-    public static async Task BlinkCardAsync(PlayerChoiceContext choiceContext, CardModel card)
+    /// <param name="card">The card to entrance.</param>
+    public static async Task EntranceCardAsync(PlayerChoiceContext choiceContext, CardModel card)
     {
         await CardCmd.Exhaust(choiceContext, card);
-        if (card.Keywords.Contains(Blink))
+        if (card.Keywords.Contains(Entrance))
         {
-            BlinkCardsToRestore.Add(card);
+            EntranceCardsToRestore.Add(card);
         }
         else
         {
-            card.AddKeyword(BlinkedModel.Blinked);
+            card.AddKeyword(EntrancedModel.Entranced);
         }
     }
 
@@ -55,11 +56,11 @@ public class BlinkModel() : CustomSingletonModel(true, false)
             return;
         }
 
-        CardModel[] cards = [.. player.PlayerCombatState.AllCards.Where(c => BlinkCardsToRestore.Contains(c))];
+        CardModel[] cards = [.. player.PlayerCombatState.AllCards.Where(c => EntranceCardsToRestore.Contains(c))];
 
-        foreach (CardModel c in cards)
+        foreach(CardModel c in cards)
         {
-            BlinkCardsToRestore.Remove(c);
+            EntranceCardsToRestore.Remove(c);
             if (c.Pile == player.PlayerCombatState.ExhaustPile)
             {
                 await CardPileCmd.Add(c, PileType.Draw, CardPilePosition.Top);

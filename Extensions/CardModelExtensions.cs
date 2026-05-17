@@ -1,8 +1,12 @@
 ﻿using System.Numerics;
+using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Monsters;
 using MegaCrit.Sts2.Core.Nodes.GodotExtensions;
+using Pikcube.Common.Keywords;
 using Pikcube.Common.Utility;
 
 namespace Pikcube.Common.Extensions;
@@ -60,6 +64,35 @@ public static class CardModelExtensions
         public void RemoveTempKeywordEarly(CardKeyword keyword)
         {
             TempKeywordManager.DestroyKeywordsEarly(instance, keyword);
+        }
+
+        /// <summary>
+        /// Exhaust target card by calling CardCmd.ExhaustAsync
+        /// </summary>
+        /// <param name="choiceContext">The player choice context</param>
+        /// <param name="causedByEthereal">True if caused by Etherial</param>
+        /// <param name="skipVisuals">True if visuals should be skipped</param>
+        public Task ExhaustAsync(PlayerChoiceContext choiceContext, bool causedByEthereal, bool skipVisuals)
+        {
+            return CardCmd.Exhaust(choiceContext, instance, causedByEthereal, skipVisuals);
+        }
+
+        /// <summary>
+        /// Blink target card by calling BlinkModel.BlinkCardAsync
+        /// </summary>
+        /// <param name="choiceContext">The player choice context</param>
+        public Task BlinkAsync(PlayerChoiceContext choiceContext)
+        {
+            return BlinkModel.BlinkCardAsync(choiceContext, instance);
+        }
+
+        /// <summary>
+        /// Entrance target card by calling EntranceModel.EntranceCardAsync
+        /// </summary>
+        /// <param name="choiceContext">The player choice context</param>
+        public Task EntranceAsync(PlayerChoiceContext choiceContext)
+        {
+            return EntranceModel.EntranceCardAsync(choiceContext, instance);
         }
     }
 }

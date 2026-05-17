@@ -5,6 +5,7 @@ using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Multiplayer;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -30,7 +31,7 @@ namespace Pikcube.Common.Powers;
 /// <summary>
 /// Custom Power that emulates the Cursed Debuff from Dicey Dungeons. Causes cards to have a 50% chance to be played 0 times. <br/>
 /// Decrements by 1 when succesfully trigggered, and is removed at the end of the turn if any stacks remain. <br/>
-/// Cards that aren't played are always sent to the discard pile and still expend their energy cost.
+/// Cards that aren't played are exhuasted for the turn, and are placed on top of the draw pile at the end of the round.
 /// </summary>
 [UsedImplicitly]
 public class CursedPower : CustomPowerModel
@@ -52,8 +53,7 @@ public class CursedPower : CustomPowerModel
         BlinkTip
     ];
 
-    internal static readonly IHoverTip BlinkTip = new HoverTip(new LocString(locTable, "PIKCUBE-CURSED_POWER.blinkTitle"),
-        new LocString(locTable, "PIKCUBE-CURSED_POWER.blinkDescription"));
+    internal static readonly IHoverTip BlinkTip = HoverTipFactory.FromKeyword(EntranceModel.Entrance);
 
     /// <inheritdoc />
     protected override void AfterCloned()
@@ -164,12 +164,7 @@ public class CursedPower : CustomPowerModel
             }
         }
 
-        CardCmd.ApplyKeyword(card, BlinkModel.Blink);
-
-        if (card.Pile?.Type is PileType.Play)
-        {
-            CardPileAddResult result = await CardPileCmd.Add(card, PileType.Exhaust);
-        }
+        await EntranceModel.EntranceCardAsync(new HookPlayerChoiceContext(OwningPlayer, OwningPlayer.NetId, GameActionType.Combat), card);
 
         await PowerCmd.Decrement(this);
     }

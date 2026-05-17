@@ -1,6 +1,12 @@
 {
-  "PIKCUBE-BLINK.description": "At the start of next turn, return this card to your hand without Blink.",
+  "PIKCUBE-BLINK.description": "Exhaust this card, at the end of this turn, place this card into your hand.",
   "PIKCUBE-BLINK.title": "Blink",
-  "PIKCUBE-CURSED.description": "This card has a 50% chance of being [gold]Blinked[/gold] instead of played.",
-  "PIKCUBE-CURSED.title": "Cursed"
+  "PIKCUBE-BLINKED.description": "At the end of this turn, place this card into your hand.",
+  "PIKCUBE-BLINKED.title": "Blinked",
+  "PIKCUBE-CURSED.description": "This card has a 50% chance of being [gold]Entranced[/gold] instead of played.",
+  "PIKCUBE-CURSED.title": "Cursed",
+  "PIKCUBE-ENTRANCED.description": "At the end of this turn, place this card on top of your draw pile.",
+  "PIKCUBE-ENTRANCED.title": "Entranced",
+  "PIKCUBE-ENTRANCE.description": "Exhaust this card, at the end of this turn, place this card on top of your draw pile.",
+  "PIKCUBE-ENTRANCE.title": "Entrance"
 }

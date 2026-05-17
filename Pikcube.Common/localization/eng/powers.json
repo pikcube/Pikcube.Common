@@ -1,7 +1,5 @@
 {
-  "PIKCUBE-CURSED_POWER.description": "Cards have a [blue]50%[/blue] chance to be [gold]Blinked[/gold] instead of played this turn. Disappears once triggered.",
-  "PIKCUBE-CURSED_POWER.smartDescription": "Cards have a [blue]50%[/blue] chance to be [gold]Blinked[/gold] instead of played this turn. Disappears once triggered.",
-  "PIKCUBE-CURSED_POWER.title": "Cursed",
-  "PIKCUBE-CURSED_POWER.blinkTitle": "Blink",
-  "PIKCUBE-CURSED_POWER.blinkDescription": "Exhaust target card, at the start of next turn, return it to your hand."
+  "PIKCUBE-CURSED_POWER.description": "Cards have a [blue]50%[/blue] chance to be [gold]Entranced[/gold] instead of played this turn. Disappears once triggered.",
+  "PIKCUBE-CURSED_POWER.smartDescription": "Cards have a [blue]50%[/blue] chance to be [gold]Entranced[/gold] instead of played this turn. Disappears once triggered.",
+  "PIKCUBE-CURSED_POWER.title": "Cursed"
 }

@@ -9,7 +9,7 @@ using Pikcube.Common.Utility;
 namespace Pikcube.Common.Keywords;
 
 /// <summary>
-/// Marks cards that have a 50% chance of being Blinked instead of being played.
+/// Marks cards that have a 50% chance of being Entranced instead of being played.
 /// </summary>
 [UsedImplicitly]
 public class CursedModel() : CustomSingletonModel(true, true), IModifyHoverTipsListener
