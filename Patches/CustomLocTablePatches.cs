@@ -10,8 +10,6 @@ internal static class CustomLocTablePatches
     [HarmonyPatch(typeof(LocManager), "ListLocalizationFiles")]
     public static class ListLocalizationFilesPatch
     {
-        private static readonly string[] ExtraTables = [];
-
         public static IEnumerable<string> Postfix(IEnumerable<string> __result)
         {
             return CustomLocManager.GetCustomLocTables(__result);
