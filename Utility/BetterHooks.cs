@@ -1,8 +1,10 @@
 ﻿using MegaCrit.Sts2.Core.Entities.Merchant;
 using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Hooks;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.MonsterMoves.Intents;
 using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Nodes.Screens.CardSelection;
 using MegaCrit.Sts2.Core.Runs;
@@ -197,5 +199,46 @@ public static class BetterHooks
         }
 
         return args.NewPotion;
+    }
+
+    /// <summary>
+    /// Defines a named void method that accepts a PlayerChoiceContext and CardModel.
+    /// </summary>
+    public delegate void AfterCardBlinkedHandler(PlayerChoiceContext choiceContext, CardModel card);
+
+    /// <summary>
+    /// Invoked immediately after a card is Blinked.
+    /// </summary>
+    public static event AfterCardBlinkedHandler? AfterCardBlinked;
+
+    internal static async Task OnBlinkAsync(PlayerChoiceContext choiceContext, CardModel card)
+    {
+        AfterCardBlinked?.Invoke(choiceContext, card);
+
+        foreach (IOnBlinkListener listener in card.Owner.RunState.IterateHookListeners(card.Owner.Creature.CombatState).OfType<IOnBlinkListener>())
+        {
+            await listener.AfterCardBlinkedAsync(choiceContext, card);
+        }
+    }
+
+    /// <summary>
+    /// Defines a named void method that accepts a PlayerChoiceContext and CardModel.
+    /// </summary>
+    public delegate void AfterCardEntrancedHandler(PlayerChoiceContext choiceContext, CardModel card);
+
+    /// <summary>
+    /// Invoked immediately after a card is Entranced.
+    /// </summary>
+    public static event AfterCardEntrancedHandler? AfterCardEntranced;
+
+    internal static async Task OnEntranceAsync(PlayerChoiceContext choiceContext, CardModel card)
+    {
+        AfterCardEntranced?.Invoke(choiceContext, card);
+
+        foreach (IOnEntrancedListener listener in card.Owner.RunState
+                     .IterateHookListeners(card.Owner.Creature.CombatState).OfType<IOnEntrancedListener>())
+        {
+            await listener.AfterCardEntrancedAsync(choiceContext, card);
+        }
     }
 }

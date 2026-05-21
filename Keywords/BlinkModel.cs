@@ -6,6 +6,7 @@ using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Cards;
+using Pikcube.Common.Utility;
 
 namespace Pikcube.Common.Keywords;
 
@@ -84,5 +85,7 @@ public class BlinkModel() : CustomSingletonModel(true, false)
         {
             card.AddKeyword(BlinkedModel.Blinked);
         }
+
+        await BetterHooks.OnBlinkAsync(choiceContext, card);
     }
 }

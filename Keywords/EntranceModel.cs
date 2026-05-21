@@ -6,6 +6,7 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
+using Pikcube.Common.Utility;
 
 namespace Pikcube.Common.Keywords;
 
@@ -46,6 +47,8 @@ public class EntranceModel() : CustomSingletonModel(true, false)
         {
             card.AddKeyword(EntrancedModel.Entranced);
         }
+
+        await BetterHooks.OnEntranceAsync(choiceContext, card);
     }
 
     /// <inheritdoc/>
