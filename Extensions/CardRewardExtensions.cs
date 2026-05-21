@@ -20,7 +20,7 @@ public static class CardRewardExtensions
         /// <exception cref="NoNullAllowedException"></exception>
         public CardCreationOptions GetOptions()
         {
-            MethodInfo? property = AccessTools.DeclaredPropertyGetter(typeof(T), "Options") ?? throw new NoNullAllowedException();
+            MethodInfo property = AccessTools.DeclaredPropertyGetter(typeof(T), "Options") ?? throw new NoNullAllowedException();
             return (CardCreationOptions?)property.Invoke(instance, []) ?? throw new NoNullAllowedException();
         }
     }

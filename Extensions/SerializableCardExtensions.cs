@@ -189,5 +189,6 @@ public static class SerializableCardExtensions
     private static bool IsEqual(SerializableEnchantment? leftCardEnchantment, EnchantmentModel? rightCardEnchantment) =>
         IsEqual(rightCardEnchantment, leftCardEnchantment);
 
+    [UsedImplicitly]
     private static bool IsEqual(SerializableCard leftCard, CardModel rightCard) => IsEqual(rightCard, leftCard);
 }

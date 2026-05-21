@@ -4,7 +4,6 @@ using MegaCrit.Sts2.Core.Nodes.CommonUi;
 using MegaCrit.Sts2.Core.Nodes.Screens.CardSelection;
 using System.Data;
 using System.Reflection;
-using MegaCrit.Sts2.Core.Models;
 using Pikcube.Common.Utility;
 
 namespace Pikcube.Common.Patches;

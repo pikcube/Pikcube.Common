@@ -39,7 +39,7 @@ public class TempKeywordManager() : CustomSingletonModel(true, true)
     /// <param name="source">The object passed during registration</param>
     public static void DestroyKeywordsEarly(object source)
     {
-        foreach ((CardModel cardModel, CardKeyword cardKeyword, object? s) in CurrentTempKeywords.Where(trio => trio.Item3 is not null && trio.Item3 == source))
+        foreach ((CardModel cardModel, CardKeyword cardKeyword, object? _) in CurrentTempKeywords.Where(trio => trio.Item3 is not null && trio.Item3 == source))
         {
             cardModel.RemoveKeyword(cardKeyword);
         }

@@ -1,5 +1,4 @@
 ﻿using MegaCrit.Sts2.Core.Localization;
-using MegaCrit.Sts2.Core.Models.Cards;
 
 namespace Pikcube.Common.Extensions;
 

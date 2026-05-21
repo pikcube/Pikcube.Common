@@ -13,7 +13,7 @@ public static class CustomRunManager
     private static HashSet<Type> AdditionalGoodModifiers { get; } = [];
     private static HashSet<Type> AdditionalBadModifiers { get; } = [];
 
-    internal static bool IsLocked { get; set; } = false;
+    internal static bool IsLocked { get; set; }
 
     /// <summary>
     /// Add a modifier to the Custom Run Menu.

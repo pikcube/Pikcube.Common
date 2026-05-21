@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using MegaCrit.Sts2.Core.Models;
 using System.Reflection;
+using JetBrains.Annotations;
 using Pikcube.Common.Utility;
 
 namespace Pikcube.Common.Patches;
@@ -8,6 +9,7 @@ namespace Pikcube.Common.Patches;
 [HarmonyPatch]
 internal static class CardModelClonePatch
 {
+    [UsedImplicitly]
     static IEnumerable<MethodBase> TargetMethods()
     {
         MethodInfo? onPlayMethod = typeof(CardModel).GetMethod(nameof(CardModel.MutableClone));
@@ -29,6 +31,7 @@ internal static class CardModelClonePatch
         }
     }
 
+    [UsedImplicitly]
     internal static void Postfix(AbstractModel __result, AbstractModel __instance)
     {
         if (__instance is not CardModel || __result is not CardModel)
