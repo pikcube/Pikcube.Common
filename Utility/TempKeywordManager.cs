@@ -2,6 +2,7 @@
 using JetBrains.Annotations;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Rooms;
@@ -16,7 +17,7 @@ namespace Pikcube.Common.Utility;
 public class TempKeywordManager() : CustomSingletonModel(true, true)
 {
     /// <inheritdoc />
-    public override Task BeforeSideTurnStart(PlayerChoiceContext choiceContext, CombatSide side, ICombatState combatState)
+    public override Task BeforeSideTurnStart(PlayerChoiceContext choiceContext, CombatSide side, IReadOnlyList<Creature> participants, ICombatState combatState)
     {
         if (side == CombatSide.Player)
         {
