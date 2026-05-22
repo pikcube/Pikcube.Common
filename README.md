@@ -72,7 +72,7 @@ You can easilly download this from [NuGet](https://www.nuget.org/packages/Pikcub
 Alternatively, add this line to your `.csproj` file
 
 ```xml
-<PackageReference Include="Pikcube.Common" Version="0.1.50" />
+<PackageReference Include="Pikcube.Common" Version="0.1.53" />
 ```
 
 Alternatively, you can install it manually.
