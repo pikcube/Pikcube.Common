@@ -12,7 +12,7 @@ namespace Pikcube.Common.Keywords;
 /// <summary>
 /// Exhaust this card. At the end of the turn, return this card to your hand.
 /// </summary>
-public class BlinkModel() : CustomSingletonModel(true, false)
+public class BlinkModel() : CustomSingletonModel(HookType.Combat)
 {
     /// <summary>
     /// Exhaust this card. At the end of the turn, return this card to your hand.
@@ -20,7 +20,7 @@ public class BlinkModel() : CustomSingletonModel(true, false)
     [CustomEnum, KeywordProperties(AutoKeywordPosition.After)]
     public static CardKeyword Blink = 0;
 
-    private static readonly HashSet<CardModel> BlinkCardsToRestore = [];
+    internal static readonly HashSet<CardModel> BlinkCardsToRestore = [];
 
     /// <inheritdoc />
     public override Task BeforeCombatStart()
@@ -42,30 +42,6 @@ public class BlinkModel() : CustomSingletonModel(true, false)
         BlinkCardsToRestore.Add(card);
         return (PileType.Exhaust, CardPilePosition.Top);
 
-    }
-
-    /// <inheritdoc/>
-    public override async Task AfterAutoPostPlayPhaseEntered(PlayerChoiceContext choiceContext, Player player)
-    {
-        if (player.PlayerCombatState is null)
-        {
-            return;
-        }
-
-        CardModel[] cards = [.. player.PlayerCombatState.AllCards.Where(c => BlinkCardsToRestore.Contains(c))];
-
-        List<Task> tasks = [];
-
-        foreach (CardModel c in cards)
-        {
-            BlinkCardsToRestore.Remove(c);
-            if (c.Pile == player.PlayerCombatState.ExhaustPile)
-            {
-                tasks.Add(CardPileCmd.Add(c, PileType.Draw, CardPilePosition.Top));
-            }
-        }
-        tasks.Add(Task.Delay(TimeSpan.FromSeconds(0.15)));
-        await Task.WhenAll(tasks);
     }
 
     /// <summary>

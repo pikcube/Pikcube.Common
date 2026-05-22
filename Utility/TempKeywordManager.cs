@@ -14,7 +14,7 @@ namespace Pikcube.Common.Utility;
 /// Internal Manager for Temp Keywords
 /// </summary>
 [UsedImplicitly]
-public class TempKeywordManager() : CustomSingletonModel(true, true)
+public class TempKeywordManager() : CustomSingletonModel(HookType.Combat)
 {
     /// <inheritdoc />
     public override Task BeforeSideTurnStart(PlayerChoiceContext choiceContext, CombatSide side, IReadOnlyList<Creature> participants, ICombatState combatState)

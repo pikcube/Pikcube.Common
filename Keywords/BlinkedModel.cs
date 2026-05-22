@@ -11,7 +11,7 @@ namespace Pikcube.Common.Keywords;
 /// <summary>
 /// At the end of the turn, return this card to your hand.
 /// </summary>
-public class BlinkedModel() : CustomSingletonModel(true, false)
+public class BlinkedModel() : CustomSingletonModel(HookType.Combat)
 {
     /// <summary>
     /// At the end of the turn, return this card to your hand.
@@ -27,7 +27,7 @@ public class BlinkedModel() : CustomSingletonModel(true, false)
             return;
         }
 
-        List<CardModel> blinkCards = [.. player.PlayerCombatState.AllCards.Where(c => c.Keywords.Contains(Blinked))];
+        List<CardModel> blinkCards = [.. player.PlayerCombatState.AllCards.Where(c => c.Keywords.Contains(Blinked) || BlinkModel.BlinkCardsToRestore.Contains(c))];
         List<Task> tasks = [];
         foreach (CardModel card in blinkCards)
         {

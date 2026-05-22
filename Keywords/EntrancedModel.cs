@@ -14,7 +14,7 @@ namespace Pikcube.Common.Keywords;
 /// At the end of your turn, place this card on top of your discard pile.
 /// </summary>
 [UsedImplicitly]
-public class EntrancedModel() : CustomSingletonModel(true, false)
+public class EntrancedModel() : CustomSingletonModel(HookType.Combat)
 {
     /// <summary>
     /// At the end of this turn, place this card on top of your draw pile.

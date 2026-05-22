@@ -14,7 +14,7 @@ namespace Pikcube.Common.Keywords;
 /// Exhaust target card, at the end of this turn, place it on top of your draw pile.
 /// </summary>
 [UsedImplicitly]
-public class EntranceModel() : CustomSingletonModel(true, false)
+public class EntranceModel() : CustomSingletonModel(HookType.Combat)
 {
     /// <summary>
     /// Exhaust target card, at the end of this turn, place it on top of your draw pile.
