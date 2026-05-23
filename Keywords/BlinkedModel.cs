@@ -32,10 +32,13 @@ public class BlinkedModel() : CustomSingletonModel(HookType.Combat)
         foreach (CardModel card in blinkCards)
         {
             card.RemoveKeyword(Blinked);
-            if (card.Pile?.Type != PileType.Hand)
+            if (card.Pile?.Type == PileType.Hand)
             {
-                tasks.Add(CardPileCmd.Add(card, PileType.Hand));
+                continue;
             }
+
+            tasks.Add(CardPileCmd.Add(card, PileType.Hand));
+            BlinkModel.BlinkCardsToRestore.Remove(card);
         }
         tasks.Add(Task.Delay(TimeSpan.FromSeconds(0.15)));
         await Task.WhenAll(tasks);
