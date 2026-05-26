@@ -19,12 +19,9 @@ public class BlinkModel() : CustomSingletonModel(HookType.Combat)
     [CustomEnum, KeywordProperties(AutoKeywordPosition.After)]
     public static CardKeyword Blink = 0;
 
-    internal static readonly HashSet<CardModel> BlinkCardsToRestore = [];
-
     /// <inheritdoc />
     public override Task BeforeCombatStart()
     {
-        BlinkCardsToRestore.Clear();
         return Task.CompletedTask;
     }
 
@@ -38,7 +35,8 @@ public class BlinkModel() : CustomSingletonModel(HookType.Combat)
             return (pileType, position);
         }
 
-        BlinkCardsToRestore.Add(card);
+        card.AddKeyword(BlinkedModel.Blinked);
+
         return (PileType.Exhaust, CardPilePosition.Top);
 
     }
@@ -51,15 +49,7 @@ public class BlinkModel() : CustomSingletonModel(HookType.Combat)
     public static async Task BlinkCardAsync(PlayerChoiceContext choiceContext, CardModel card)
     {
         await CardCmd.Exhaust(choiceContext, card);
-        if (card.Keywords.Contains(Blink))
-        {
-            BlinkCardsToRestore.Add(card);
-        }
-        else
-        {
-            card.AddKeyword(BlinkedModel.Blinked);
-        }
-
+        card.AddKeyword(BlinkedModel.Blinked);
         await BetterHooks.OnBlinkAsync(choiceContext, card);
     }
 }

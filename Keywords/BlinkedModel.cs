@@ -27,7 +27,7 @@ public class BlinkedModel() : CustomSingletonModel(HookType.Combat)
             return;
         }
 
-        List<CardModel> blinkCards = [.. player.PlayerCombatState.AllCards.Where(c => c.Keywords.Contains(Blinked) || BlinkModel.BlinkCardsToRestore.Contains(c))];
+        List<CardModel> blinkCards = [.. player.PlayerCombatState.AllCards.Where(c => c.Keywords.Contains(Blinked))];
         List<Task> tasks = [];
         foreach (CardModel card in blinkCards)
         {
@@ -38,7 +38,6 @@ public class BlinkedModel() : CustomSingletonModel(HookType.Combat)
             }
 
             tasks.Add(CardPileCmd.Add(card, PileType.Hand));
-            BlinkModel.BlinkCardsToRestore.Remove(card);
         }
         tasks.Add(Task.Delay(TimeSpan.FromSeconds(0.15)));
         await Task.WhenAll(tasks);
