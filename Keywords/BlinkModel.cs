@@ -4,6 +4,7 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
+using Pikcube.Common.Extensions;
 using Pikcube.Common.Utility;
 
 namespace Pikcube.Common.Keywords;
@@ -48,7 +49,7 @@ public class BlinkModel() : CustomSingletonModel(HookType.Combat)
     /// <param name="card">The card to blink.</param>
     public static async Task BlinkCardAsync(PlayerChoiceContext choiceContext, CardModel card)
     {
-        await CardCmd.Exhaust(choiceContext, card);
+        await card.ExhaustAsync(choiceContext);
         card.AddKeyword(BlinkedModel.Blinked);
         await BetterHooks.OnBlinkAsync(choiceContext, card);
     }

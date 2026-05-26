@@ -69,7 +69,7 @@ public static class CardModelExtensions
         /// <param name="choiceContext">The player choice context</param>
         /// <param name="causedByEthereal">True if caused by Etherial</param>
         /// <param name="skipVisuals">True if visuals should be skipped</param>
-        public Task ExhaustAsync(PlayerChoiceContext choiceContext, bool causedByEthereal, bool skipVisuals)
+        public Task ExhaustAsync(PlayerChoiceContext choiceContext, bool causedByEthereal = false, bool skipVisuals = false)
         {
             return CardCmd.Exhaust(choiceContext, instance, causedByEthereal, skipVisuals);
         }
