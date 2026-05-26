@@ -34,15 +34,12 @@ internal static class CardModelClonePatch
     [UsedImplicitly]
     internal static void Postfix(AbstractModel __result, AbstractModel __instance)
     {
-        if (__instance is not CardModel || __result is not CardModel)
+        if (__instance is not CardModel original || __result is not CardModel result)
         {
             return;
         }
 
-        CardModel original = (CardModel)__instance;
-        CardModel card = (CardModel)__result;
-
-        BetterHooks.OnCardCloned(original, card);
+        BetterHooks.OnCardCloned(original, result);
     }
 
 }
