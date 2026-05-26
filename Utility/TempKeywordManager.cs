@@ -40,11 +40,13 @@ public class TempKeywordManager() : CustomSingletonModel(HookType.Combat)
     /// <param name="source">The object passed during registration</param>
     public static void DestroyKeywordsEarly(object source)
     {
-        foreach ((CardModel cardModel, CardKeyword cardKeyword, object? _) in CurrentTempKeywords.Where(trio => trio.Item3 is not null && trio.Item3 == source))
+        (CardModel, CardKeyword, object?)[] toRemove = CurrentTempKeywords.Where(trio => trio.Item3 is not null && trio.Item3 == source).ToArray();
+
+        foreach ((CardModel, CardKeyword, object?) trio in toRemove)
         {
-            cardModel.RemoveKeyword(cardKeyword);
+            trio.Item1.RemoveKeyword(trio.Item2);
+            CurrentTempKeywords.Remove(trio);
         }
-        CurrentTempKeywords.Clear();
     }
 
     internal static void DestroyKeywordsEarly<T>(T instance, CardKeyword keyword) where T : CardModel
