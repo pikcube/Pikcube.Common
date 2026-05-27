@@ -27,6 +27,26 @@ public class JinxPower : CustomPowerModel
         set => ((StringVar)DynamicVars["JinxDescription"]).StringValue = value;
     }
 
+    internal void PrepareForApplication(bool isDebuff, Func<PlayerChoiceContext, Creature, Task> function, LocString description)
+    {
+        IsPrepared = true;
+        IsDebuff = isDebuff;
+        OnCountdownFinished = function;
+
+        foreach (KeyValuePair<string, object> obj in description.Variables)
+        {
+            SmartDescription.AddObj(obj.Key, obj.Value);
+        }
+
+        DynamicDescription = description.GetRawText();
+    }
+
+    /// <inheritdoc />
+    public override Task AfterApplied(Creature? applier, CardModel? cardSource)
+    {
+        return IsPrepared ? Task.CompletedTask : throw new InvalidOperationException("Jinx power must be applied through JinxCmd");
+    }
+
     /// <inheritdoc />
     public override PowerType Type => GetTypeInternal();
 
@@ -42,6 +62,9 @@ public class JinxPower : CustomPowerModel
 
     /// <inheritdoc />
     public override PowerStackType StackType => PowerStackType.Counter;
+
+    /// <inheritdoc />
+    public override PowerInstanceType InstanceType => PowerInstanceType.Instanced;
 
     /// <inheritdoc />
     public override async Task BeforeSideTurnStart(PlayerChoiceContext choiceContext, CombatSide side, IReadOnlyList<Creature> participants, ICombatState combatState)
@@ -61,19 +84,5 @@ public class JinxPower : CustomPowerModel
 
         await OnCountdownFinished(choiceContext, Owner);
         await PowerCmd.Remove(this);
-    }
-
-    internal void PrepareForApplication(bool isDebuff, Func<PlayerChoiceContext, Creature, Task> function, LocString description)
-    {
-        IsPrepared = true;
-        IsDebuff = isDebuff;
-        OnCountdownFinished = function;
-        DynamicDescription = description.GetRawText();
-    }
-
-    /// <inheritdoc />
-    public override Task AfterApplied(Creature? applier, CardModel? cardSource)
-    {
-        return IsPrepared ? Task.CompletedTask : throw new InvalidOperationException("Jinx power must be applied through JinxCmd");
     }
 }

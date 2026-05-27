@@ -2,6 +2,7 @@
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization;
+using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using Pikcube.Common.Extensions;
 using Pikcube.Common.Powers;
@@ -30,6 +31,14 @@ public static class JinxCmd
         if (turnDelay < 1)
         {
             turnDelay = 1;
+        }
+
+        if (cardSource is not null)
+        {
+            foreach (DynamicVar var in cardSource.DynamicVars.Values)
+            {
+                description.Add(var);
+            }
         }
 
         JinxPower jinxPower = ModelDb.Power<JinxPower>().StrongMutableClone();
