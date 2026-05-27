@@ -21,15 +21,7 @@ public class BlinkModel() : CustomSingletonModel(HookType.Combat)
     public static CardKeyword Blink = 0;
 
     /// <inheritdoc />
-    public override Task BeforeCombatStart()
-    {
-        return Task.CompletedTask;
-    }
-
-    /// <inheritdoc />
-    public override (PileType, CardPilePosition) ModifyCardPlayResultPileTypeAndPosition(CardModel card,
-        bool isAutoPlay,
-        ResourceInfo resources, PileType pileType, CardPilePosition position)
+    public override (PileType, CardPilePosition) ModifyCardPlayResultPileTypeAndPosition(CardModel card, bool isAutoPlay, ResourceInfo resources, PileType pileType, CardPilePosition position)
     {
         if (!card.Keywords.Contains(Blink))
         {
