@@ -27,10 +27,15 @@ public class BlinkModel() : CustomSingletonModel(HookType.Combat)
             return (pileType, position);
         }
 
-        card.AddKeyword(BlinkedModel.Blinked);
+        card.AddTempKeyword(BlinkedModel.Blinked);
 
         return (PileType.Exhaust, CardPilePosition.Top);
+    }
 
+    /// <inheritdoc />
+    public override async Task AfterModifyingCardPlayResultPileOrPosition(CardModel card, PileType pileType, CardPilePosition position)
+    {
+        await BetterHooks.OnBlinkAsync(new BlockingPlayerChoiceContext(), card);
     }
 
     /// <summary>
@@ -41,7 +46,7 @@ public class BlinkModel() : CustomSingletonModel(HookType.Combat)
     public static async Task BlinkCardAsync(PlayerChoiceContext choiceContext, CardModel card)
     {
         await card.ExhaustAsync(choiceContext);
-        card.AddKeyword(BlinkedModel.Blinked);
+        card.AddTempKeyword(BlinkedModel.Blinked);
         await BetterHooks.OnBlinkAsync(choiceContext, card);
     }
 }

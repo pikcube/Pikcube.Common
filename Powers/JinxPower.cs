@@ -38,7 +38,7 @@ public class JinxPower : CustomPowerModel
             SmartDescription.AddObj(obj.Key, obj.Value);
         }
 
-        DynamicDescription = description.GetRawText();
+        DynamicDescription = description.GetFormattedText();
     }
 
     /// <inheritdoc />

@@ -2,7 +2,7 @@
   "PIKCUBE-CURSED_POWER.description": "Cards have a [blue]50%[/blue] chance to be [gold]Entranced[/gold] instead of played this turn. Disappears once triggered.",
   "PIKCUBE-CURSED_POWER.smartDescription": "Cards have a [blue]50%[/blue] chance to be [gold]Entranced[/gold] instead of played this turn. Disappears once triggered.",
   "PIKCUBE-CURSED_POWER.title": "Cursed",
-  "PIKCUBE-JINX_POWER.description": "In 1 turn, {JinxDescription.StringValue}",
-  "PIKCUBE-JINX_POWER.smartDescription": "In {Amount} turns, {JinxDescription.StringValue}",
+  "PIKCUBE-JINX_POWER.description": "In [blue]1[/blue] turn, {JinxDescription.StringValue}",
+  "PIKCUBE-JINX_POWER.smartDescription": "In [blue]{Amount}[/blue] turns, {JinxDescription.StringValue}",
   "PIKCUBE-JINX_POWER.title": "Jinx"
 }

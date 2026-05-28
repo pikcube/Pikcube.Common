@@ -20,7 +20,18 @@ public static class CardModelExtensions
         /// </summary>
         /// <param name="player">The player who this card belongs to</param>
         /// <returns>A mutable instance of T with the owner set.</returns>
+        [Obsolete("Prefer `Create` over `CreateInstance`")]
         public static T CreateInstance(Player player)
+        {
+            return player.RunState.CreateCard<T>(player);
+        }
+
+        /// <summary>
+        /// Creates a mutable instance of a card and sets the card's owner to the player.
+        /// </summary>
+        /// <param name="player">The player who this card belongs to</param>
+        /// <returns>A mutable instance of T with the owner set.</returns>
+        public static T Create(Player player)
         {
             return player.RunState.CreateCard<T>(player);
         }
@@ -29,6 +40,16 @@ public static class CardModelExtensions
         /// Create an immutable instance of the card.
         /// </summary>
         /// <returns>An immutable instance of T.</returns>
+        public static T Create()
+        {
+            return ModelDb.Card<T>();
+        }
+
+        /// <summary>
+        /// Create an immutable instance of the card.
+        /// </summary>
+        /// <returns>An immutable instance of T.</returns>
+        [Obsolete("Prefer `Create` over `CreateWithoutOwner`")]
         public static T CreateWithoutOwner()
         {
             return ModelDb.Card<T>();

@@ -65,7 +65,12 @@ public class TempKeywordManager() : CustomSingletonModel(HookType.Combat)
 
     private static void BetterHooks_AfterCardCloned(CardModel original, CardModel clone)
     {
-        CurrentTempKeywords.AddRange(CurrentTempKeywords.Where(pair => pair.Item1 == original).Select(pair => (clone, pair.Item2, pair.Item3)));
+        (CardModel clone, CardKeyword, object?)[] toAdd = CurrentTempKeywords
+            .Where(pair => pair.Item1 == original)
+            .Select(pair => (clone, pair.Item2, pair.Item3))
+            .ToArray();
+
+        CurrentTempKeywords.AddRange(toAdd);
     }
 
     private static void BetterHooks_AfterRunInitialized(RunState runState)
@@ -75,8 +80,8 @@ public class TempKeywordManager() : CustomSingletonModel(HookType.Combat)
 
     internal static void Register<T>(T instance, CardKeyword keyword, object? source) where T : CardModel
     {
-        instance.AddKeyword(keyword);
         CurrentTempKeywords.Add((instance, keyword, source));
+        instance.AddKeyword(keyword);
     }
 
     private static void Clear()
@@ -86,5 +91,10 @@ public class TempKeywordManager() : CustomSingletonModel(HookType.Combat)
             cardModel.RemoveKeyword(cardKeyword);
         }
         CurrentTempKeywords.Clear();
+    }
+
+    internal static bool IsTempKeyword(CardKeyword keyword, CardModel cardModel)
+    {
+        return CurrentTempKeywords.Any(tuple => tuple.Item1 == cardModel && tuple.Item2 == keyword);
     }
 }
