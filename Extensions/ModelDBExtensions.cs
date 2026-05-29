@@ -1,4 +1,5 @@
-﻿using MegaCrit.Sts2.Core.Models;
+﻿using HarmonyLib;
+using MegaCrit.Sts2.Core.Models;
 
 namespace Pikcube.Common.Extensions;
 
@@ -7,6 +8,28 @@ namespace Pikcube.Common.Extensions;
 /// </summary>
 public static class ModelDbExtensions
 {
+    private static Dictionary<Type, AbstractModel> AllModelsDictionary
+    {
+        get
+        {
+            field ??= InitDictionary();
+            return field;
+        }
+    }
+
+    private static Dictionary<Type, AbstractModel> InitDictionary()
+    {
+        Dictionary<ModelId, AbstractModel> dic = AccessTools.DeclaredField(typeof(ModelDb), "_contentById")
+            .GetValue(null) as Dictionary<ModelId, AbstractModel> ?? throw new InvalidOperationException();
+
+        return dic.Values.ToDictionary(v => v.GetType(), v => v);
+    }
+
+    internal static void PreInit()
+    {
+        _ = AllModelsDictionary;
+    }
+
     extension(ModelDb)
     {
         /// <summary>
@@ -16,7 +39,7 @@ public static class ModelDbExtensions
         /// <returns>Instance of model in ModelDB</returns>
         public static T GetModel<T>() where T : AbstractModel
         {
-            return ModelDb.GetById<T>(ModelDb.GetId<T>());
+            return (T)AllModelsDictionary[typeof(T)];
         }
 
         /// <summary>
@@ -27,7 +50,12 @@ public static class ModelDbExtensions
         /// <returns>Instance of model in ModelDB</returns>
         public static T GetModel<T>(Type type) where T : AbstractModel
         {
-            return ModelDb.GetById<T>(ModelDb.GetId(type));
+            return (T)AllModelsDictionary[type];
         }
+
+        /// <summary>
+        /// Get every model in ModelDB
+        /// </summary>
+        public static IEnumerable<AbstractModel> AllModels => AllModelsDictionary.Values;
     }
 }

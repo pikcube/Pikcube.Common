@@ -6,7 +6,7 @@ using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Modding;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Events;
-using Pikcube.Common.Abstracts;
+using Pikcube.Common.Extensions;
 using Pikcube.Common.Patches;
 using Pikcube.Common.Utility;
 
@@ -45,21 +45,7 @@ public partial class MainFile : Node
     private static void BetterHooks_AfterOneTimeInitialization()
     {
         InitDarvCache();
-        RegisterCustomRunModifiers();
-    }
-
-    private static void RegisterCustomRunModifiers()
-    {
-        FieldInfo contentFieldInfo = AccessTools.Field(typeof(ModelDb), "_contentById") ?? throw new NoNullAllowedException();
-        Dictionary<ModelId, AbstractModel> allModels = (Dictionary<ModelId, AbstractModel>?)contentFieldInfo.GetValue(null) ?? throw new NoNullAllowedException();
-
-        foreach (CustomRunModifierModel modifier in allModels.Values.OfType<CustomRunModifierModel>()
-                     .OrderBy(modifier => modifier.Info.Priority)
-                     .ThenBy(modifier => modifier.Info.Primary)
-                     .ThenBy(modifier => modifier.Info.Secondary))
-        {
-            CustomRunManager.RegisterInternal(modifier);
-        }
+        ModelDbExtensions.PreInit();
     }
 
     private static void InitDarvCache()
