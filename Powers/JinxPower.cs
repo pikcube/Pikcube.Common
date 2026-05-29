@@ -67,9 +67,9 @@ public class JinxPower : CustomPowerModel
     public override PowerInstanceType InstanceType => PowerInstanceType.Instanced;
 
     /// <inheritdoc />
-    public override async Task BeforeSideTurnStart(PlayerChoiceContext choiceContext, CombatSide side, IReadOnlyList<Creature> participants, ICombatState combatState)
+    public override async Task AfterSideTurnEndLate(PlayerChoiceContext choiceContext, CombatSide side, IEnumerable<Creature> participants)
     {
-        if (side != CombatSide.Player)
+        if (side == Owner.Side)
         {
             return;
         }
@@ -83,6 +83,9 @@ public class JinxPower : CustomPowerModel
         Flash();
 
         await OnCountdownFinished(choiceContext, Owner);
-        await PowerCmd.Remove(this);
+        if (Owner.IsAlive)
+        {
+            await PowerCmd.Remove(this);
+        }
     }
 }
