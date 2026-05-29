@@ -31,26 +31,6 @@ relicSpawnManager.DeregisterRuleIfExist<UnceasingTop>(); //Use the same relicSpa
 
 Registration uses the type itself instead of the canonical instance as a key, so you are free to create rules before ModelDB is initialized.
 
-## Feature: CustomRunManager
-
-An API that allows for adding custom runs to the Custom Run list. Entries are appended after the base game runs.
-
-Adding a run modifier is as easy as creating a class that inherits from `CustomRunModifierModel`
-
-```cs
-public class PraiseSnecko() : CustomRunModifierModel(CustomRunType.Good, new CustomRunModifierInfo(MainFile.ModId, "Praise Snecko"))
-```
-
-Your custom run modifier needs to pass in whether this modifier is Green (`CustomRunType.Good`) or Red (`CustomRunType.Bad`), along with an instance of `CustomRunModifierInfo`.
-
-Your ModId can be passed to the `CustomRunModifierInfo` manually, but if you are using a BaseLib template it'll be found in MainFile.ModId. You will also need to pass the name of your modifier (for sorting purposes).
-
-You can optionally define a sort priority to set whether your modifier comes before the base game modifiers (`ModifierPriority.PrefixGeneric`) or after (`ModifierPriority.PostfixGeneric`). `ModifierPriority.PostfixGeneric` is the default. Modifiers will be sorted alphabetically by the name in your modifier info.
-
-You can also use `ModifierPriority.PrefixSegmented` and `ModifierPriority.PostfixSegmented` if you prefer your modifiers to all be grouped together (instead of being mixed in with all custom modifiers).
-
-There is also a special priority of `ModifierPriority.Immediate` which is for modifiers that belong at the very top of the list. This is intended for modifiers that are essencially customization options (such as an "Always Whale" modifier to start with standard Neow Options).
-
 ## Feature: An implementation of the Cursed Debuff from Dicey Dungeons
 
 Like I said, I wrote these for my own mods. I'm a huge fan of Dicey Dungeons, and I use this debuff enough it was easier to just stick it in my common library.
