@@ -8,7 +8,7 @@
 		<DefaultItemExcludes>packages/**</DefaultItemExcludes>
 		<AppOutputBase>$(MSBuildProjectDirectory)\</AppOutputBase>
 		<PathMap>$(AppOutputBase)=.\</PathMap>
-		<VersionPrefix>0.1.55</VersionPrefix>
+		<VersionPrefix>0.1.56</VersionPrefix>
 	</PropertyGroup>
 
 	<!-- OS Detection -->
@@ -115,15 +115,18 @@
 		  <Pack>True</Pack>
 		  <PackagePath>\</PackagePath>
 		</None>
-		<None Include="Pikcube.Common.json">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
 		<None Include="project.godot" />
 		<None Include="README.md">
 		  <Pack>True</Pack>
 		  <PackagePath>\</PackagePath>
 		</None>
 		<None Include="Pikcube.Common/**" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- For including in .nupkg for template to auto export to mods folder -->
+		<Content Condition="Exists('$(ModsPath)$(MSBuildProjectName)/$(MSBuildProjectName).pck')" Include="$(ModsPath)$(MSBuildProjectName)/$(MSBuildProjectName).pck" PackagePath="/Content/" />
+		<Content Include="$(MSBuildProjectName).json" PackagePath="/Content/" />
 	</ItemGroup>
 
 
@@ -135,6 +138,12 @@
 	  <Reference Include="sts2">
 		  <HintPath>$(Sts2DataDir)/sts2.dll</HintPath>
 	  </Reference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Update="Pikcube.Common.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
 	</ItemGroup>
     
 	<Target Name="CheckDependencyPaths">

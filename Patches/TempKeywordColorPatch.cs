@@ -3,7 +3,6 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Models;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using Pikcube.Common.Utility;
 
 namespace Pikcube.Common.Patches;
@@ -24,7 +23,7 @@ internal static class TempKeywordColorPatch
         KeywordFormats.Clear();
     }
 
-    internal static string Postfix(string __result, CardModel __instance, PileType pileType, Creature? target = null)
+    internal static string Postfix(string __result, CardModel __instance)
     { 
         foreach (KeyValuePair<CardKeyword, string> pair in KeywordFormats)
         {
@@ -68,7 +67,7 @@ internal static class KeywordExtensionPatch
 {
     public static MethodBase TargetMethod()
     {
-        var type = AccessTools.TypeByName("CardKeywordExtensions");
+        Type? type = AccessTools.TypeByName("CardKeywordExtensions");
         return AccessTools.DeclaredMethod(type, "GetCardText");
     }
 
