@@ -76,6 +76,15 @@ public static class CardModelExtensions
         }
 
         /// <summary>
+        /// Add a Keyword to this card. It is Purple.
+        /// </summary>
+        /// <param name="keyword">The keyword to add to the card.</param>
+        public void AddPurpleKeyword(CardKeyword keyword)
+        {
+            PurpleKeywordManager.Register(instance, keyword);
+        }
+
+        /// <summary>
         /// Remove a Keyword prematurely.
         /// </summary>
         /// <param name="keyword">The keyword to remove.</param>

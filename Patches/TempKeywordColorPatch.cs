@@ -26,7 +26,7 @@ internal static class TempKeywordColorPatch
     { 
         foreach (KeyValuePair<CardKeyword, string> pair in KeywordFormats)
         {
-            if (!TempKeywordManager.IsTempKeyword(pair.Key, __instance))
+            if (!PurpleKeywordManager.IsPurpleKeyword(pair.Key, __instance))
             {
                 continue;
             }

@@ -40,7 +40,7 @@ public class TempKeywordManager() : CustomSingletonModel(HookType.Combat)
     /// <param name="source">The object passed during registration</param>
     public static void DestroyKeywordsEarly(object source)
     {
-        (CardModel, CardKeyword, object?)[] toRemove = CurrentTempKeywords.Where(trio => trio.Item3 is not null && trio.Item3 == source).ToArray();
+        (CardModel, CardKeyword, object?)[] toRemove = [.. CurrentTempKeywords.Where(trio => trio.Item3 is not null && trio.Item3 == source)];
 
         foreach ((CardModel, CardKeyword, object?) trio in toRemove)
         {
@@ -65,10 +65,9 @@ public class TempKeywordManager() : CustomSingletonModel(HookType.Combat)
 
     private static void BetterHooks_AfterCardCloned(CardModel original, CardModel clone)
     {
-        (CardModel clone, CardKeyword, object?)[] toAdd = CurrentTempKeywords
+        (CardModel clone, CardKeyword, object?)[] toAdd = [.. CurrentTempKeywords
             .Where(pair => pair.Item1 == original)
-            .Select(pair => (clone, pair.Item2, pair.Item3))
-            .ToArray();
+            .Select(pair => (clone, pair.Item2, pair.Item3))];
 
         CurrentTempKeywords.AddRange(toAdd);
     }

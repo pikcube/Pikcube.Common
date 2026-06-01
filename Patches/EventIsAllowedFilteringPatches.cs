@@ -13,10 +13,10 @@ internal static class EventIsAllowedFilteringPatches
     [UsedImplicitly]
     static IEnumerable<MethodBase> TargetMethods()
     {
-        MethodInfo? onPlayMethod = typeof(EventModel).GetMethod(nameof(EventModel.IsAllowed));
-        if (onPlayMethod is not null)
+        MethodInfo? isAllowedMethod = typeof(EventModel).GetMethod(nameof(EventModel.IsAllowed));
+        if (isAllowedMethod is not null)
         {
-            yield return onPlayMethod;
+            yield return isAllowedMethod;
         }
 
         foreach (Type? type in AccessTools.AllTypes()
