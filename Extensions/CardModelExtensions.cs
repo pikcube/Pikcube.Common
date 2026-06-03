@@ -121,5 +121,14 @@ public static class CardModelExtensions
         {
             return EntranceModel.EntranceCardAsync(choiceContext, instance);
         }
+
+        /// <summary>
+        /// Discard target card by calling CardCmd.Discard
+        /// </summary>
+        /// <param name="choiceContext">The player choice context</param>
+        public Task DiscardAsync(PlayerChoiceContext choiceContext)
+        {
+            return CardCmd.Discard(choiceContext, instance);
+        }
     }
 }
