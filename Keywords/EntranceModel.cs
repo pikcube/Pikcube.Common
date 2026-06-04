@@ -23,12 +23,10 @@ public class EntranceModel() : CustomSingletonModel(HookType.Combat)
     [CustomEnum, KeywordProperties(AutoKeywordPosition.After)]
     public static CardKeyword Entrance = 0;
 
-    private static readonly HashSet<CardModel> EntranceCardsToRestore = [];
 
     /// <inheritdoc />
     public override Task BeforeCombatStart()
     {
-        EntranceCardsToRestore.Clear();
         return Task.CompletedTask;
     }
 
@@ -43,36 +41,13 @@ public class EntranceModel() : CustomSingletonModel(HookType.Combat)
 
         if (card.Keywords.Contains(Entrance))
         {
-            EntranceCardsToRestore.Add(card);
+            card.AddPurpleKeyword(EntrancedModel.Entranced);
         }
         else
         {
-            card.AddKeyword(EntrancedModel.Entranced);
+            card.AddPurpleKeyword(EntrancedModel.Entranced);
         }
 
         await BetterHooks.OnEntranceAsync(choiceContext, card);
-    }
-
-    /// <inheritdoc/>
-    public override async Task AfterAutoPostPlayPhaseEntered(PlayerChoiceContext choiceContext, Player player)
-    {
-        if (player.PlayerCombatState is null)
-        {
-            return;
-        }
-
-        CardModel[] cards = [.. player.PlayerCombatState.AllCards.Where(c => EntranceCardsToRestore.Contains(c))];
-
-        List<Task> tasks = [];
-        foreach(CardModel c in cards)
-        {
-            EntranceCardsToRestore.Remove(c);
-            if (c.Pile == player.PlayerCombatState.ExhaustPile)
-            {
-                tasks.Add(CardPileCmd.Add(c, PileType.Draw, CardPilePosition.Top));
-            }
-        }
-        await Task.WhenAll(tasks);
-
     }
 }

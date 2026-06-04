@@ -70,9 +70,10 @@ public static class CardModelExtensions
         /// </summary>
         /// <param name="keyword">The keyword to temporarily add</param>
         /// <param name="source">Optional: The object registering the keyword. Allows for early destruction by calling DestroyKeywordsEarly</param>
-        public void AddTempKeyword(CardKeyword keyword, object? source = null)
+        /// <param name="isManualDestoryRequired">Keyword must be destroyed by calling DestroyKeywordsEarly</param>
+        public void AddTempKeyword(CardKeyword keyword, object? source = null, bool isManualDestoryRequired = false)
         {
-            TempKeywordManager.Register(instance, keyword, source);
+            TempKeywordManager.Register(instance, keyword, source, isManualDestoryRequired);
         }
 
         /// <summary>

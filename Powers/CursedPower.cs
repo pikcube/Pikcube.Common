@@ -89,7 +89,7 @@ public class CursedPower : CustomPowerModel
 
         foreach (CardModel card in ValidCards)
         {
-            card.AddTempKeyword(CursedModel.Cursed, this);
+            card.AddTempKeyword(CursedModel.Cursed, this, true);
         }
     }
 

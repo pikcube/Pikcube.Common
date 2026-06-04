@@ -40,9 +40,9 @@ public class TempKeywordManager() : CustomSingletonModel(HookType.Combat)
     /// <param name="source">The object passed during registration</param>
     public static void DestroyKeywordsEarly(object source)
     {
-        (CardModel, CardKeyword, object?)[] toRemove = [.. CurrentTempKeywords.Where(trio => trio.Item3 is not null && trio.Item3 == source)];
+        (CardModel, CardKeyword, object?, bool)[] toRemove = [.. CurrentTempKeywords.Where(trio => trio.Item3 is not null && trio.Item3 == source)];
 
-        foreach ((CardModel, CardKeyword, object?) trio in toRemove)
+        foreach ((CardModel, CardKeyword, object?, bool) trio in toRemove)
         {
             trio.Item1.RemoveKeyword(trio.Item2);
             CurrentTempKeywords.Remove(trio);
@@ -55,7 +55,7 @@ public class TempKeywordManager() : CustomSingletonModel(HookType.Combat)
     }
 
 
-    private static List<(CardModel, CardKeyword, object?)> CurrentTempKeywords { get; } = [];
+    private static List<(CardModel, CardKeyword, object?, bool)> CurrentTempKeywords { get; } = [];
 
     static TempKeywordManager()
     {
@@ -65,9 +65,9 @@ public class TempKeywordManager() : CustomSingletonModel(HookType.Combat)
 
     private static void BetterHooks_AfterCardCloned(CardModel original, CardModel clone)
     {
-        (CardModel clone, CardKeyword, object?)[] toAdd = [.. CurrentTempKeywords
+        (CardModel clone, CardKeyword, object?, bool)[] toAdd = [.. CurrentTempKeywords
             .Where(pair => pair.Item1 == original)
-            .Select(pair => (clone, pair.Item2, pair.Item3))];
+            .Select(pair => (clone, pair.Item2, pair.Item3, pair.Item4))];
 
         CurrentTempKeywords.AddRange(toAdd);
     }
@@ -77,19 +77,19 @@ public class TempKeywordManager() : CustomSingletonModel(HookType.Combat)
         CurrentTempKeywords.Clear();
     }
 
-    internal static void Register<T>(T instance, CardKeyword keyword, object? source) where T : CardModel
+    internal static void Register<T>(T instance, CardKeyword keyword, object? source, bool isManualDestoryRequired) where T : CardModel
     {
-        CurrentTempKeywords.Add((instance, keyword, source));
+        CurrentTempKeywords.Add((instance, keyword, source, isManualDestoryRequired));
         instance.AddKeyword(keyword);
     }
 
     private static void Clear()
     {
-        foreach ((CardModel cardModel, CardKeyword cardKeyword, object? _) in CurrentTempKeywords)
+        foreach ((CardModel cardModel, CardKeyword cardKeyword, object? _, bool isManualRequired) in CurrentTempKeywords.Where(set => !set.Item4))
         {
             cardModel.RemoveKeyword(cardKeyword);
         }
-        CurrentTempKeywords.Clear();
+        CurrentTempKeywords.RemoveAll(set => !set.Item4);
     }
 
     internal static bool IsTempKeyword(CardKeyword keyword, CardModel cardModel)

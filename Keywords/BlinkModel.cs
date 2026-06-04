@@ -1,8 +1,10 @@
 ﻿using BaseLib.Abstracts;
 using BaseLib.Patches.Content;
+using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Nodes.Cards;
 using Pikcube.Common.Extensions;
 using Pikcube.Common.Utility;
 
@@ -19,24 +21,21 @@ public class BlinkModel() : CustomSingletonModel(HookType.Combat)
     [CustomEnum, KeywordProperties(AutoKeywordPosition.After)]
     public static CardKeyword Blink = 0;
 
+
     /// <inheritdoc />
-    public override (PileType, CardPilePosition) ModifyCardPlayResultPileTypeAndPosition(CardModel card, bool isAutoPlay, ResourceInfo resources, PileType pileType, CardPilePosition position)
+    public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        if (!card.Keywords.Contains(Blink))
+        if (!cardPlay.Card.Keywords.Contains(Blink))
         {
-            return (pileType, position);
+            return;
         }
 
-        card.AddPurpleKeyword(BlinkedModel.Blinked);
+        cardPlay.Card.AddPurpleKeyword(BlinkedModel.Blinked);
 
-        return (PileType.Exhaust, CardPilePosition.Top);
+        await CardPileCmd.Add(cardPlay.Card, PileType.Exhaust);
+        await BetterHooks.OnBlinkAsync(new BlockingPlayerChoiceContext(), cardPlay.Card);
     }
 
-    /// <inheritdoc />
-    public override async Task AfterModifyingCardPlayResultPileOrPosition(CardModel card, PileType pileType, CardPilePosition position)
-    {
-        await BetterHooks.OnBlinkAsync(new BlockingPlayerChoiceContext(), card);
-    }
 
     /// <summary>
     /// Exhaust target card, at the end of this turn, move it from your exhaust pile to the top of your draw pile.
