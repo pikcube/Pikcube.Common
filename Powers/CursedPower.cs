@@ -161,7 +161,8 @@ public class CursedPower : CustomPowerModel
             }
         }
 
-        await EntranceModel.EntranceCardAsync(new HookPlayerChoiceContext(OwningPlayer, OwningPlayer.NetId, GameActionType.Combat), card);
+        CardPileAddResult moveCard = await CardPileCmd.Add(card, PileType.Draw, CardPilePosition.Top);
+        CardCmd.PreviewCardPileAdd(moveCard);
 
         await PowerCmd.Decrement(this);
     }

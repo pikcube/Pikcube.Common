@@ -4,7 +4,7 @@ using Pikcube.Common.Utility;
 
 namespace Pikcube.Common.Patches;
 
-[HarmonyPatch(typeof(OneTimeInitialization), "ExecuteDeferred")]
+[HarmonyPatch(typeof(OneTimeInitialization), "ExecuteEssential")]
 internal class OneTimeInitPatches
 {
     internal static void Postfix()

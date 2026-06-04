@@ -11,22 +11,11 @@ namespace Pikcube.Common.Keywords;
 /// Marks cards that have a 50% chance of being Entranced instead of being played.
 /// </summary>
 [UsedImplicitly]
-public class CursedModel() : CustomSingletonModel(HookType.Combat), IModifyHoverTipsListener
+public class CursedModel() : CustomSingletonModel(HookType.Combat)
 {
     /// <summary>
     /// Card has a 50% chance to be exhausted for the turn instead of played.
     /// </summary>
     [CustomEnum, KeywordProperties(AutoKeywordPosition.Before)]
     public static CardKeyword Cursed = 0;
-
-    /// <inheritdoc />
-    public void ModifyCardHoverTips(CardModel sender, HoverTipEventArgs e)
-    {
-        if (!sender.Keywords.Contains(Cursed))
-        {
-            return;
-        }
-
-        e.NewHoverTips.Add(Powers.CursedPower.BlinkTip);
-    }
 }
