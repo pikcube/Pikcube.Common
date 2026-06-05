@@ -43,13 +43,13 @@ public class CursedPower : CustomPowerModel
     private List<CardModel> IgnoredCards { get; set; } = null!;
     private Player? OwningPlayer { get; set; }
 
-    /// <inheritdoc />
-    protected override IEnumerable<IHoverTip> ExtraHoverTips =>
-    [
-        BlinkTip
-    ];
+    ///// <inheritdoc />
+    //protected override IEnumerable<IHoverTip> ExtraHoverTips =>
+    //[
+    //    BlinkTip
+    //];
 
-    internal static readonly IHoverTip BlinkTip = HoverTipFactory.FromKeyword(EntranceModel.Entrance);
+    //internal static readonly IHoverTip BlinkTip = HoverTipFactory.FromKeyword(EntranceModel.Entrance);
 
     /// <inheritdoc />
     protected override void AfterCloned()
