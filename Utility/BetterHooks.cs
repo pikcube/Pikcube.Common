@@ -1,4 +1,5 @@
-﻿using MegaCrit.Sts2.Core.Entities.Merchant;
+﻿using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Merchant;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
@@ -236,6 +237,50 @@ public static class BetterHooks
                      .IterateHookListeners(card.Owner.Creature.CombatState).OfType<IOnEntrancedListener>())
         {
             await listener.AfterCardEntrancedAsync(choiceContext, card);
+        }
+    }
+
+    /// <summary>
+    /// Defines a named void method that accepts a PowerModel, optional Creature, and optional CardModel
+    /// </summary>
+    public delegate void PowerAppliedHandler(PowerModel power, Creature? applier, CardModel? cardSource);
+
+    /// <summary>
+    /// Invoked immediately after a power is applied and has called its AfterApplied function.
+    /// </summary>
+    public static event PowerAppliedHandler? AfterPowerApplied;
+
+    internal static async Task OnPowerAppliedAsync(Task task, PowerModel powerModel, Creature? applier, CardModel? cardSource)
+    {
+        await task;
+        AfterPowerApplied?.Invoke(powerModel, applier, cardSource);
+
+        foreach (IAfterPowerAppliedListener listener in powerModel.Owner.CombatState?.IterateHookListeners()
+                     .OfType<IAfterPowerAppliedListener>() ?? [])
+        {
+            await listener.AfterPowerAppliedAsync(powerModel, cardSource, applier);
+        }
+    }
+
+    /// <summary>
+    /// Defines a named void method that accepts a PowerModel and an optional Creature
+    /// </summary>
+    public delegate void PowerRemovedHandler(PowerModel power, Creature? oldOwner);
+
+    /// <summary>
+    /// Invoked immediately after a power is removed and has called its AfterRemoved function.
+    /// </summary>
+    public static event PowerRemovedHandler? AfterPowerRemoved;
+
+    internal static async Task OnPowerRemvoedAsync(Task task, PowerModel powerModel, Creature? oldOwner)
+    {
+        await task;
+        AfterPowerRemoved?.Invoke(powerModel, oldOwner);
+
+        foreach (IAfterPowerRemovedListener listener in powerModel.Owner.CombatState?.IterateHookListeners()
+                     .OfType<IAfterPowerRemovedListener>() ?? [])
+        {
+            await listener.AfterPowerRemovedAsync(powerModel, oldOwner);
         }
     }
 }
