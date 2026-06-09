@@ -20,7 +20,7 @@ internal static class PaelPatches
             return true;
         }
 
-        List<EventOption> options1 = __instance.GetPrivateProperty<Pael, List<EventOption>>("OptionPool1") ?? throw new NoNullAllowedException();
+        List<EventOption> options1 = __instance.GetPrivateProperty<Pael, IList<EventOption>>("OptionPool1")?.ToList() ?? throw new NoNullAllowedException();
         options1.RemoveAll(e => e.Relic is not null && !RelicSpawnManager.CanRelicSpawn(e.Relic, __instance.Owner.RunState));
 
         List<EventOption> options2 = __instance.GetPrivateProperty<Pael, List<EventOption>>("OptionPool2") ?? throw new NoNullAllowedException();
