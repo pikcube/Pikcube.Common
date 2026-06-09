@@ -1,7 +1,7 @@
-﻿using MegaCrit.Sts2.Core.Commands;
+﻿using JetBrains.Annotations;
+using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Models;
-using JetBrains.Annotations;
 
 namespace Pikcube.Common.Extensions;
 

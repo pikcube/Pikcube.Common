@@ -3,12 +3,14 @@ using System.Reflection;
 using Godot;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Logging;
 using MegaCrit.Sts2.Core.Modding;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Events;
 using Pikcube.Common.Extensions;
 using Pikcube.Common.Patches;
 using Pikcube.Common.Utility;
+using Logger = MegaCrit.Sts2.Core.Logging.Logger;
 
 namespace Pikcube.Common;
 
@@ -28,7 +30,7 @@ public partial class MainFile : Node
     /// <summary>
     /// A logger instance for the library
     /// </summary>
-    public static MegaCrit.Sts2.Core.Logging.Logger Logger { get; } = new(ModId, MegaCrit.Sts2.Core.Logging.LogType.Generic);
+    public static Logger Logger { get; } = new(ModId, LogType.Generic);
 
     /// <summary>
     /// Called when this mod is initalized by the game
