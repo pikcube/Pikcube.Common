@@ -82,7 +82,7 @@ public static class BetterHooks
     public delegate void ModifyCardHoverTipsHandler(CardModel sender, HoverTipEventArgs e);
 
     /// <summary>
-    /// Invoked immediately after getting the hover tips for a card. Modify HoverTipEventArgs.NewHovetTips to change the return value.
+    /// Invoked immediately after getting the hover tips for a card. Modify HoverTipEventArgs.NewHoverTips to change the return value.
     /// </summary>
     public static event ModifyCardHoverTipsHandler? ModifyCardHoverTips;
 
@@ -152,6 +152,11 @@ public static class BetterHooks
     internal static void OnCardCloned(CardModel original, CardModel clone)
     {
         AfterCardCloned?.Invoke(original, clone);
+        foreach (ICardClonedListener listener in original.RunState?.IterateHookListeners(original.CombatState)
+                     .OfType<ICardClonedListener>() ?? [])
+        {
+            listener.AfterCardCloned(original, clone);
+        }
     }
 
     /// <summary>
@@ -255,8 +260,7 @@ public static class BetterHooks
         await task;
         AfterPowerApplied?.Invoke(powerModel, applier, cardSource);
 
-        foreach (IAfterPowerAppliedListener listener in powerModel.Owner.CombatState?.IterateHookListeners()
-                     .OfType<IAfterPowerAppliedListener>() ?? [])
+        foreach (IAfterPowerAppliedListener listener in powerModel.Owner.CombatState?.IterateHookListeners().OfType<IAfterPowerAppliedListener>() ?? [])
         {
             await listener.AfterPowerAppliedAsync(powerModel, cardSource, applier);
         }
