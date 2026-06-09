@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using System.Buffers;
+using HarmonyLib;
 using MegaCrit.Sts2.Core.Events;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Enchantments;
@@ -14,7 +15,7 @@ internal static class PaelPatches
 {
     public static bool Prefix(ref IReadOnlyList<EventOption> __result, Pael __instance)
     {
-        if (__instance.Owner is null)
+        if (__instance.Owner is null || __instance.AllPossibleOptions.Select(option => option.Relic).All(r => r is null || RelicSpawnManager.CanRelicSpawn(r, __instance.Owner.RunState)))
         {
             return true;
         }

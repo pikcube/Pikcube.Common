@@ -14,7 +14,7 @@ internal static class OrobasPatches
 {
     public static bool Prefix(ref IReadOnlyList<EventOption> __result, Orobas __instance)
     {
-        if (__instance.Owner is null)
+        if (__instance.Owner is null || __instance.AllPossibleOptions.Select(option => option.Relic).All(r => r is null || RelicSpawnManager.CanRelicSpawn(r, __instance.Owner.RunState)))
         {
             return true;
         }
