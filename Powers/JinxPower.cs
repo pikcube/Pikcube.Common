@@ -42,9 +42,14 @@ public class JinxPower : CustomPowerModel
     }
 
     /// <inheritdoc />
-    public override Task AfterApplied(Creature? applier, CardModel? cardSource)
+    public override async Task AfterApplied(Creature? applier, CardModel? cardSource)
     {
-        return IsPrepared ? Task.CompletedTask : throw new InvalidOperationException("Jinx power must be applied through JinxCmd");
+        if (IsPrepared)
+        {
+            return;
+        }
+
+        throw new InvalidOperationException("Jinx power must be applied through JinxCmd");
     }
 
     /// <inheritdoc />
