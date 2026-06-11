@@ -13,10 +13,10 @@ internal static class RelicIsAllowedFilteringPatches
     [UsedImplicitly]
     static IEnumerable<MethodBase> TargetMethods()
     {
-        MethodInfo? onPlayMethod = typeof(RelicModel).GetMethod(nameof(RelicModel.IsAllowed));
-        if (onPlayMethod is not null)
+        MethodInfo? isAllowedMethod = typeof(RelicModel).GetMethod(nameof(RelicModel.IsAllowed));
+        if (isAllowedMethod is not null)
         {
-            yield return onPlayMethod;
+            yield return isAllowedMethod;
         }
 
         foreach (Type? type in AccessTools.AllTypes()
