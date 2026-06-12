@@ -1,4 +1,5 @@
-﻿using MegaCrit.Sts2.Core.Commands;
+﻿using MegaCrit.Sts2.Core.Combat;
+using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -24,6 +25,17 @@ public static class CardModelExtensions
         public static T CreateInstance(Player player)
         {
             return player.RunState.CreateCard<T>(player);
+        }
+
+        /// <summary>
+        /// Creates a mutable instance of a card for combat and sets the card's owner to the player.
+        /// </summary>
+        /// <param name="player">The player who this card belongs to</param>
+        /// <param name="combatstate">The current combat state</param>
+        /// <returns>A mutable instance of T with the owner set.</returns>
+        public static T Create(Player player, CombatState combatstate)
+        {
+            return combatstate.CreateCard<T>(player);
         }
 
         /// <summary>

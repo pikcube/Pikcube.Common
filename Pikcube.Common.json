@@ -3,13 +3,13 @@
   "name": "Pikcube.Common",
   "author": "Pikcube",
   "description": "Slay the Spire 2 library built on top of BaseLib.",
-  "version": "v0.2.6",
+  "version": "v0.2.7",
   "has_pck": true,
   "has_dll": true,
   "dependencies": [
     {
       "id": "BaseLib",
-      "min_version": "v3.2.0"
+      "min_version": "v3.2.1"
     }
   ],
   "affects_gameplay": true
