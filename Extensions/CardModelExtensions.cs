@@ -33,7 +33,7 @@ public static class CardModelExtensions
         /// <param name="player">The player who this card belongs to</param>
         /// <param name="combatstate">The current combat state</param>
         /// <returns>A mutable instance of T with the owner set.</returns>
-        public static T Create(Player player, CombatState combatstate)
+        public static T Create(Player player, ICombatState combatstate)
         {
             return combatstate.CreateCard<T>(player);
         }
