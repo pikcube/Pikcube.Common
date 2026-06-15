@@ -47,4 +47,23 @@ public class BlinkModel() : CustomSingletonModel(HookType.Combat)
         card.AddPurpleKeyword(BlinkedModel.Blinked);
         await BetterHooks.OnBlinkAsync(choiceContext, card);
     }
+
+    /// <summary>
+    /// Exhaust target card, at the end of this turn, move it from your exhaust pile to the top of your draw pile.
+    /// </summary>
+    /// <param name="choiceContext">The current player choice context.</param>
+    /// <param name="cards">The cards to blink.</param>
+    public static async Task BlinkCardsAsync(PlayerChoiceContext choiceContext, IEnumerable<CardModel> cards)
+    {
+        CardModel[] c = [..cards];
+        foreach (CardModel card in c)
+        {
+            await card.ExhaustAsync(choiceContext);
+            card.AddPurpleKeyword(BlinkedModel.Blinked);
+        }
+        foreach (CardModel card in c)
+        {
+            await BetterHooks.OnBlinkAsync(choiceContext, card);
+        }
+    }
 }
