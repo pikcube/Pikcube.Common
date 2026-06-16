@@ -159,7 +159,7 @@ public class CursedPower : CustomPowerModel
             }
         }
 
-        CardPileAddResult moveCard = await CardPileCmd.Add(card, PileType.Draw, CardPilePosition.Top);
+        await CardPileCmd.Add(card, PileType.Draw, CardPilePosition.Top);
 
         await PowerCmd.Decrement(this);
     }
