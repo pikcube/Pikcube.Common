@@ -1,9 +1,9 @@
 ﻿using BaseLib.Abstracts;
 using BaseLib.Patches.Content;
-using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Rooms;
 using Pikcube.Common.Extensions;
 using Pikcube.Common.Utility;
 
@@ -14,11 +14,34 @@ namespace Pikcube.Common.Keywords;
 /// </summary>
 public class BlinkModel() : CustomSingletonModel(HookType.Combat)
 {
+    private static List<CardModel> ShouldBlinkList { get; } = [];
+
+    /// <inheritdoc />
+    public override Task BeforeRoomEntered(AbstractRoom room)
+    {
+        ShouldBlinkList.Clear();
+        return Task.CompletedTask;
+    }
+
     /// <summary>
     /// Exhaust this card. At the end of the turn, return this card to your hand.
     /// </summary>
     [CustomEnum, KeywordProperties(AutoKeywordPosition.After)]
     public static CardKeyword Blink = 0;
+
+    /// <inheritdoc />
+    public override (PileType, CardPilePosition) ModifyCardPlayResultPileTypeAndPosition(CardModel card,
+        bool isAutoPlay,
+        ResourceInfo resources, PileType pileType, CardPilePosition position)
+    {
+        if (card.Keywords.Contains(Blink) || card.ShouldBlinkOnNextPlay)
+        {
+            return (PileType.Exhaust, CardPilePosition.Bottom);
+        }
+
+
+        return (pileType, position);
+    }
 
 
     /// <inheritdoc />
@@ -31,8 +54,7 @@ public class BlinkModel() : CustomSingletonModel(HookType.Combat)
 
         cardPlay.Card.AddPurpleKeyword(BlinkedModel.Blinked);
 
-        await CardPileCmd.Add(cardPlay.Card, PileType.Exhaust);
-        await BetterHooks.OnBlinkAsync(new BlockingPlayerChoiceContext(), cardPlay.Card);
+        await BetterHooks.OnBlinkAsync(choiceContext, cardPlay.Card);
     }
 
 
@@ -64,6 +86,23 @@ public class BlinkModel() : CustomSingletonModel(HookType.Combat)
         foreach (CardModel card in c)
         {
             await BetterHooks.OnBlinkAsync(choiceContext, card);
+        }
+    }
+
+    internal static bool ShouldBlink<T>(T instance) where T : CardModel
+    {
+        return !instance.ExhaustOnNextPlay && ShouldBlinkList.Any(c => c == instance);
+    }
+
+    internal static void SetShouldBlink<T>(T instance, bool value) where T : CardModel
+    {
+        if (value)
+        {
+            ShouldBlinkList.Add(instance);
+        }
+        else
+        {
+            ShouldBlinkList.Remove(instance);
         }
     }
 }

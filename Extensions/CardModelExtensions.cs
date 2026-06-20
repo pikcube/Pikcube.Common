@@ -17,6 +17,16 @@ public static class CardModelExtensions
     extension<T>(T instance) where T : CardModel
     {
         /// <summary>
+        /// Determines if this card should be Blinked on the next card play. Is defined to be false if the card should exhaust on next play instead.
+        /// </summary>
+        public bool ShouldBlinkOnNextPlay
+        {
+            get => BlinkModel.ShouldBlink(instance);
+            set => BlinkModel.SetShouldBlink(instance, value);
+        }
+
+
+        /// <summary>
         /// Creates a mutable instance of a card and sets the card's owner to the player.
         /// </summary>
         /// <param name="player">The player who this card belongs to</param>
