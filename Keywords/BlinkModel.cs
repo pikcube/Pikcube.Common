@@ -47,7 +47,7 @@ public class BlinkModel() : CustomSingletonModel(HookType.Combat)
     /// <inheritdoc />
     public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        if (!cardPlay.Card.Keywords.Contains(Blink))
+        if (!cardPlay.Card.Keywords.Contains(Blink) && !cardPlay.Card.ShouldBlinkOnNextPlay)
         {
             return;
         }
@@ -55,6 +55,7 @@ public class BlinkModel() : CustomSingletonModel(HookType.Combat)
         cardPlay.Card.AddPurpleKeyword(BlinkedModel.Blinked);
 
         await BetterHooks.OnBlinkAsync(choiceContext, cardPlay.Card);
+        cardPlay.Card.ShouldBlinkOnNextPlay = false;
     }
 
 
