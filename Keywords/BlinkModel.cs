@@ -64,9 +64,10 @@ public class BlinkModel() : CustomSingletonModel(HookType.Combat)
     /// </summary>
     /// <param name="choiceContext">The current player choice context.</param>
     /// <param name="card">The card to blink.</param>
-    public static async Task BlinkCardAsync(PlayerChoiceContext choiceContext, CardModel card)
+    /// <param name="skipVisuals">True if the visuals should be skipped.</param>
+    public static async Task BlinkCardAsync(PlayerChoiceContext choiceContext, CardModel card, bool skipVisuals = false)
     {
-        await card.ExhaustAsync(choiceContext);
+        await card.ExhaustAsync(choiceContext, false, skipVisuals);
         card.AddPurpleKeyword(BlinkedModel.Blinked);
         await BetterHooks.OnBlinkAsync(choiceContext, card);
     }
@@ -76,12 +77,13 @@ public class BlinkModel() : CustomSingletonModel(HookType.Combat)
     /// </summary>
     /// <param name="choiceContext">The current player choice context.</param>
     /// <param name="cards">The cards to blink.</param>
-    public static async Task BlinkCardsAsync(PlayerChoiceContext choiceContext, IEnumerable<CardModel> cards)
+    /// <param name="skipVisuals">True if the visuals should be skipped.</param>
+    public static async Task BlinkCardsAsync(PlayerChoiceContext choiceContext, IEnumerable<CardModel> cards, bool skipVisuals = false)
     {
         CardModel[] c = [..cards];
         foreach (CardModel card in c)
         {
-            await card.ExhaustAsync(choiceContext);
+            await card.ExhaustAsync(choiceContext, skipVisuals: skipVisuals);
             card.AddPurpleKeyword(BlinkedModel.Blinked);
         }
         foreach (CardModel card in c)
