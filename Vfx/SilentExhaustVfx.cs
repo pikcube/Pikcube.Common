@@ -7,9 +7,9 @@ namespace Pikcube.Common.Vfx;
 
 internal static class SilentExhaustVfx
 {
-    internal static NExhaustVfx? Create(NCard card)
+    internal static NCardExhaustVfx? Create(NCard card)
     {
         SfxPatch.SilenceNext.Add(TmpSfx.cardExhaust);
-        return NExhaustVfx.Create(card);
+        return NCardExhaustVfx.Create(card);
     }
 }
