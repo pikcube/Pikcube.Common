@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using Pikcube.Common.Utility;
 
 namespace Pikcube.Common.Extensions;
 
@@ -15,9 +16,20 @@ public static class PrivateAccessExtensions
         /// <param name="name">The name of the property.</param>
         /// <typeparam name="TRet">The type of the property.</typeparam>
         /// <returns>The current property value.</returns>
-        public TRet? GetPrivateProperty<TRet>(string name)
+        public PrivatePropertyWrapper<T, TRet> PrivatePropertyWrapper<TRet>(string name)
         {
-            return (TRet?)AccessTools.DeclaredProperty(typeof(T), name).GetValue(instance);
+            return new PrivatePropertyWrapper<T, TRet>(instance, name);
+        }
+
+        /// <summary>
+        /// Get an inaccessible field's value through Access Tools.
+        /// </summary>
+        /// <param name="name">The name of the field.</param>
+        /// <typeparam name="TRet">The type of the property.</typeparam>
+        /// <returns>The current property value.</returns>
+        public PrivateFieldWrapper<T, TRet> PrivateFieldWrapper<TRet>(string name)
+        {
+            return new PrivateFieldWrapper<T, TRet>(instance, name);
         }
     }
 }

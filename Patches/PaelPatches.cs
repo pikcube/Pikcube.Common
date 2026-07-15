@@ -19,28 +19,28 @@ internal static class PaelPatches
             return true;
         }
 
-        List<EventOption> options1 = __instance.GetPrivateProperty<Pael, IList<EventOption>>("OptionPool1")?.ToList() ?? throw new NoNullAllowedException();
+        List<EventOption> options1 = __instance.PrivatePropertyWrapper<Pael, IList<EventOption>>("OptionPool1").Value?.ToList() ?? throw new NoNullAllowedException();
         options1.RemoveAll(e => e.Relic is not null && !RelicSpawnManager.CanRelicSpawn(e.Relic, __instance.Owner.RunState));
 
-        List<EventOption> options2 = __instance.GetPrivateProperty<Pael, List<EventOption>>("OptionPool2") ?? throw new NoNullAllowedException();
+        List<EventOption> options2 = __instance.PrivatePropertyWrapper<Pael, List<EventOption>>("OptionPool2").Value ?? throw new NoNullAllowedException();
 
         if (__instance.Owner.Deck.Cards.Count(c => ModelDb.Enchantment<Goopy>().CanEnchant(c)) >= 3)
         {
-            options2.Add(__instance.GetPrivateProperty<Pael, EventOption>("PaelsClawOption") ?? throw new NoNullAllowedException());
+            options2.Add(__instance.PrivatePropertyWrapper<Pael, EventOption>("PaelsClawOption").Value ?? throw new NoNullAllowedException());
         }
 
         if (__instance.Owner.Deck.Cards.Count(c => c.IsRemovable) >= 5)
         {
-            options2.Add(__instance.GetPrivateProperty<Pael, EventOption>("PaelsToothOption") ?? throw new NoNullAllowedException());
+            options2.Add(__instance.PrivatePropertyWrapper<Pael, EventOption>("PaelsToothOption").Value ?? throw new NoNullAllowedException());
         }
 
-        options2.Add(__instance.GetPrivateProperty<Pael, EventOption>("PaelsGrowthOption") ?? throw new NoNullAllowedException());
+        options2.Add(__instance.PrivatePropertyWrapper<Pael, EventOption>("PaelsGrowthOption").Value ?? throw new NoNullAllowedException());
         options2.RemoveAll(e => e.Relic is not null && !RelicSpawnManager.CanRelicSpawn(e.Relic, __instance.Owner.RunState));
 
-        List<EventOption> options3 = __instance.GetPrivateProperty<Pael, List<EventOption>>("OptionPool3") ?? throw new NoNullAllowedException();
+        List<EventOption> options3 = __instance.PrivatePropertyWrapper<Pael, List<EventOption>>("OptionPool3").Value ?? throw new NoNullAllowedException();
         if (!__instance.Owner.HasEventPet())
         {
-            options3.Add(__instance.GetPrivateProperty<Pael, EventOption>("PaelsLegionOption") ?? throw new NoNullAllowedException());
+            options3.Add(__instance.PrivatePropertyWrapper<Pael, EventOption>("PaelsLegionOption").Value ?? throw new NoNullAllowedException());
         }
         options3.RemoveAll(e => e.Relic is not null && !RelicSpawnManager.CanRelicSpawn(e.Relic, __instance.Owner.RunState));
 

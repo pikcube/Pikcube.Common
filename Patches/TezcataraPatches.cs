@@ -18,18 +18,18 @@ internal static class TezcataraPatches
             return true;
         }
 
-        List<EventOption> options1 = __instance.GetPrivateProperty<Tezcatara, List<EventOption>>("OptionPool1") ?? throw new NoNullAllowedException();
+        List<EventOption> options1 = __instance.PrivatePropertyWrapper<Tezcatara, List<EventOption>>("OptionPool1").Value ?? throw new NoNullAllowedException();
         if (__instance.Owner.Deck.Cards.Any(c => c.Tags.Contains(CardTag.Strike) && c.Rarity == CardRarity.Basic))
         {
-            options1.Add(__instance.GetPrivateProperty<Tezcatara, EventOption>("NutritiousSoupOption") ?? throw new NoNullAllowedException());
+            options1.Add(__instance.PrivatePropertyWrapper<Tezcatara, EventOption>("NutritiousSoupOption").Value ?? throw new NoNullAllowedException());
         }
 
         options1.RemoveAll(e => e.Relic is not null && !RelicSpawnManager.CanRelicSpawn(e.Relic, __instance.Owner.RunState));
 
-        List<EventOption> options2 = __instance.GetPrivateProperty<Tezcatara, List<EventOption>>("OptionPool2") ?? throw new NoNullAllowedException();
+        List<EventOption> options2 = __instance.PrivatePropertyWrapper<Tezcatara, List<EventOption>>("OptionPool2").Value ?? throw new NoNullAllowedException();
         options2.RemoveAll(e => e.Relic is not null && !RelicSpawnManager.CanRelicSpawn(e.Relic, __instance.Owner.RunState));
         
-        List<EventOption> options3 = __instance.GetPrivateProperty<Tezcatara, List<EventOption>>("OptionPool3") ?? throw new NoNullAllowedException();
+        List<EventOption> options3 = __instance.PrivatePropertyWrapper<Tezcatara, List<EventOption>>("OptionPool3").Value ?? throw new NoNullAllowedException();
         options3.RemoveAll(e => e.Relic is not null && !RelicSpawnManager.CanRelicSpawn(e.Relic, __instance.Owner.RunState));
 
 
