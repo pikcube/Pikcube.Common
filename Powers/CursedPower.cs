@@ -12,8 +12,10 @@ using MegaCrit.Sts2.Core.Helpers;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Nodes.Cards;
+using MegaCrit.Sts2.Core.Nodes.Combat;
 using MegaCrit.Sts2.Core.Nodes.Rooms;
 using MegaCrit.Sts2.Core.Nodes.Vfx;
+using MegaCrit.Sts2.Core.Nodes.Vfx.Cards;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves;
 using Pikcube.Common.Extensions;
@@ -155,11 +157,10 @@ public class CursedPower : CustomPowerModel
             if (findOnTable is not null && NGame.Instance?.CurrentRunNode is not null && NCombatRoom.Instance is not null)
             {
                 NGame.Instance.CurrentRunNode.GlobalUi.AddChildSafely(NSmokyVignetteVfx.Create(new Color(0.3f, 0.3f, 0.3f, 0.66f), new Color(1.0f, 1.0f, 1f, 0.33f)));
-                NCombatRoom.Instance.Ui.AddChildSafely(SilentExhaustVfx.Create(findOnTable));
             }
-        }
 
-        await CardPileCmd.Add(card, PileType.Draw, CardPilePosition.Top);
+            await CardPileCmd.Add(card, PileType.Draw, CardPilePosition.Top);
+        }
 
         await PowerCmd.Decrement(this);
     }
