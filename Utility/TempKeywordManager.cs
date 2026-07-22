@@ -85,7 +85,7 @@ public class TempKeywordManager() : CustomSingletonModel(HookType.Combat)
 
     private static void Clear()
     {
-        foreach ((CardModel cardModel, CardKeyword cardKeyword, object? _, bool _) in CurrentTempKeywords.Where(set => !set.Item4))
+        foreach ((CardModel cardModel, CardKeyword cardKeyword, object? _, bool _) in CurrentTempKeywords.Where(set => !set.Item4).ToArray())
         {
             cardModel.RemoveKeyword(cardKeyword);
         }
