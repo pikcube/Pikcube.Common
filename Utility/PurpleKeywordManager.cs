@@ -11,37 +11,51 @@ namespace Pikcube.Common.Utility;
 [UsedImplicitly]
 public class PurpleKeywordManager() : CustomSingletonModel(HookType.Combat)
 {
-    private static List<(CardModel, CardKeyword)> RegisteredPurpleKeywords { get; } = [];
+    /// <inheritdoc />
+    public override Task BeforeCombatStart()
+    {
+        lock (RegisteredPurpleKeywords)
+        {
+            foreach (PurpleKeywordInstance pki in RegisteredPurpleKeywords)
+            {
+                pki.Card.KeywordsChanged -= pki.KeywordChanged;
+            }
+            RegisteredPurpleKeywords.Clear();
+        }
+        return Task.CompletedTask;
+    }
+
+    internal static List<PurpleKeywordInstance> RegisteredPurpleKeywords { get; } = [];
 
 
     internal static void Register<T>(T instance, CardKeyword keyword) where T : CardModel
     {
-        instance.AddKeyword(keyword);
-        RegisteredPurpleKeywords.Add((instance, keyword));
-        instance.KeywordsChanged += InstanceOnKeywordsChanged;
-        return;
-
-        void InstanceOnKeywordsChanged()
+        lock (RegisteredPurpleKeywords)
         {
-            if (instance.Keywords.Contains(keyword))
-            {
-                return;
-            }
-
-            RegisteredPurpleKeywords.Remove((instance, keyword));
-            instance.KeywordsChanged -= InstanceOnKeywordsChanged;
+            instance.AddKeyword(keyword);
+            PurpleKeywordInstance pki = new(instance, keyword);
+            instance.KeywordsChanged += pki.KeywordChanged;
+            RegisteredPurpleKeywords.Add(pki);
         }
     }
 
     internal static bool IsPurpleKeyword(CardKeyword keyword, CardModel cardModel)
     {
-        return RegisteredPurpleKeywords.Any(purp => purp.Item1 == cardModel && purp.Item2 == keyword) || TempKeywordManager.IsTempKeyword(keyword, cardModel);
+        return RegisteredPurpleKeywords.Any(purp => purp.Card == cardModel && purp.Keyword == keyword) || 
+               TempKeywordManager.IsTempKeyword(keyword, cardModel);
     }
+}
 
-    /// <inheritdoc />
-    public override Task BeforeCombatStart()
+internal record PurpleKeywordInstance(CardModel Card, CardKeyword Keyword)
+{
+    public void KeywordChanged()
     {
-        RegisteredPurpleKeywords.Clear();
-        return Task.CompletedTask;
+        if (Card.Keywords.Contains(Keyword))
+        {
+            return;
+        }
+
+        PurpleKeywordManager.RegisteredPurpleKeywords.Remove(this);
+        Card.KeywordsChanged -= KeywordChanged;
     }
 }
