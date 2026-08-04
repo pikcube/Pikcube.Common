@@ -1,7 +1,10 @@
 ﻿using BaseLib.Abstracts;
+using HarmonyLib;
 using JetBrains.Annotations;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Models;
+using Pikcube.Common.Extensions;
+using MethodInfo = System.Reflection.MethodInfo;
 
 namespace Pikcube.Common.Utility;
 
@@ -11,6 +14,23 @@ namespace Pikcube.Common.Utility;
 [UsedImplicitly]
 public class PurpleKeywordManager() : CustomSingletonModel(HookType.Combat)
 {
+    static PurpleKeywordManager()
+    {
+        BetterHooks.ModifyCardText += BetterHooks_ModifyCardText;
+    }
+
+    private static void BetterHooks_ModifyCardText(CardModel card, ref List<string> lines)
+    {
+        foreach (CardKeyword keyword in card.Keywords.Where(keyword => IsPurpleKeyword(keyword, card)))
+        {
+            string original = (string?)GetTextMethod.Invoke(null, [keyword]) ?? string.Empty;
+            string newValue = original.Replace("gold]", "purple]");
+            lines.TryReplaceValue(original, newValue);
+        }
+    }
+
+    private static MethodInfo GetTextMethod => AccessTools.DeclaredMethod("CardKeywordExtensions:GetCardText");
+
     /// <inheritdoc />
     public override Task BeforeCombatStart()
     {

@@ -287,4 +287,19 @@ public static class BetterHooks
             await listener.AfterPowerRemovedAsync(powerModel, oldOwner);
         }
     }
+
+    /// <summary>
+    /// Method signature used for the <see cref="BetterHooks.ModifyCardText"/> event./>
+    /// </summary>
+    public delegate void ModifyCardTextHandler(CardModel card, ref List<string> lines);
+
+    /// <summary>
+    /// Allows modifying the list of strings that are joined to create card text. Mainly useful for things that modify cards or how their formatted.
+    /// </summary>
+    public static event ModifyCardTextHandler? ModifyCardText;
+
+    internal static void OnModifyCardText(CardModel instance, ref List<string> newLines)
+    {
+        ModifyCardText?.Invoke(instance, ref newLines);
+    }
 }
