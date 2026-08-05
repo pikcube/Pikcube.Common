@@ -17,7 +17,7 @@ internal static class ModifyCardDescriptionPatch
     }
 
     [UsedImplicitly]
-    static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+    public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
     {
         List<CodeInstruction> code = [.. instructions];
         for (int n = code.Count - 1; n >= 0; --n)
@@ -36,8 +36,9 @@ internal static class ModifyCardDescriptionPatch
             }
 
             code.Insert(n + 1, new CodeInstruction(OpCodes.Ldarg_0));
-            code.Insert(n + 2, CodeInstruction.Call(() => GimmieThatDamnListSoICanModifyItBeforeTheJoinCall(null!, null!)));
-            code.Insert(n + 3, new CodeInstruction(OpCodes.Ldloc_S, operand));
+            code.Insert(n + 2, new CodeInstruction(OpCodes.Ldloc_S, operand));
+            code.Insert(n + 3, CodeInstruction.Call(() => ModifyListOfStrings(null!, null!)));
+            
             break;
         }
 
@@ -45,7 +46,7 @@ internal static class ModifyCardDescriptionPatch
     }
 
     //Note that arguments will be passed in whatever order they are placed on the evaluation stack (leftmost being the bottom)
-    private static void GimmieThatDamnListSoICanModifyItBeforeTheJoinCall(List<string> lines, CardModel instance)
+    private static void ModifyListOfStrings(CardModel instance, List<string> lines)
     {
         List<string> newLines = [.. lines];
         BetterHooks.OnModifyCardText(instance, ref newLines);
