@@ -35,14 +35,14 @@ public readonly struct PrivateFieldWrapper<TParent, T>(TParent? parent, string n
 
 public readonly struct PrivatePropertyWrapper<TParent, T>(TParent? parent, string name)
 {
-    private readonly PropertyInfo _fieldInfo = AccessTools.DeclaredProperty(typeof(TParent), name);
+    private readonly PropertyInfo _propertyInfo = AccessTools.DeclaredProperty(typeof(TParent), name);
 
     /// <summary>
     /// The property's value.
     /// </summary>
     public T? Value
     {
-        get => (T?)_fieldInfo.GetValue(parent);
-        set => _fieldInfo.SetValue(parent, value);
+        get => (T?)_propertyInfo.GetValue(parent);
+        set => _propertyInfo.SetValue(parent, value);
     }
 }
