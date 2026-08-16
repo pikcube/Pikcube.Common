@@ -8,7 +8,7 @@
 		<DefaultItemExcludes>packages/**</DefaultItemExcludes>
 		<AppOutputBase>$(MSBuildProjectDirectory)\</AppOutputBase>
 		<PathMap>$(AppOutputBase)=.\</PathMap>
-		<VersionPrefix>0.3.5</VersionPrefix>
+		<VersionPrefix>0.3.6</VersionPrefix>
 	</PropertyGroup>
 
 	<!-- OS Detection -->
