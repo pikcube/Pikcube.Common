@@ -1,4 +1,5 @@
-﻿using MegaCrit.Sts2.Core.Localization;
+﻿using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Runs;
 using Pikcube.Common.Extensions;
@@ -48,7 +49,7 @@ public class SimpleEndTurnPingMachine : ICustomEndTurnPingMachine
     }
 
     /// <inheritdoc />
-    public LocString GetNext(string table, string key)
+    public LocString GetNext(Player _, string table, string key)
     {
         IndexDict.TryAdd(key, -1);
         ++IndexDict[key];

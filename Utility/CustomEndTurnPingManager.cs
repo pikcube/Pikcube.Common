@@ -17,11 +17,11 @@ internal static class CustomEndTurnPingManager
 
         if (Machines.TryGetValue(player, out ICustomEndTurnPingMachine? machine))
         {
-            return machine.GetNext(table, key);
+            return machine.GetNext(player, table, key);
         }
 
         ICustomEndTurnPingMachine newMachine = customEndTurnCharacter.Create(player);
         Machines.Add(player, newMachine);
-        return newMachine.GetNext(table, key);
+        return newMachine.GetNext(player, table, key);
     }
 }
