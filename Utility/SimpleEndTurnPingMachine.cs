@@ -23,7 +23,7 @@ public class SimpleEndTurnPingMachine : ICustomEndTurnPingMachine
     /// <param name="canonicalVars">Any dynamic vars that are required for the loc string.</param>
     public SimpleEndTurnPingMachine(bool maintainStateBetweenFloors, params IEnumerable<DynamicVar> canonicalVars)
     {
-        if (maintainStateBetweenFloors)
+        if (!maintainStateBetweenFloors)
         {
             RunManager.Instance.RoomEntered += Instance_RoomEntered;
         }
