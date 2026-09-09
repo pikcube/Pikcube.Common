@@ -8,7 +8,7 @@
 		<DefaultItemExcludes>packages/**</DefaultItemExcludes>
 		<AppOutputBase>$(MSBuildProjectDirectory)\</AppOutputBase>
 		<PathMap>$(AppOutputBase)=.\</PathMap>
-		<VersionPrefix>0.3.8</VersionPrefix>
+		<VersionPrefix>0.3.9</VersionPrefix>
 	</PropertyGroup>
 
 	<!-- OS Detection -->
@@ -89,7 +89,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Alchyr.Sts2.BaseLib" Version="3.4.5" PrivateAssets="All" />
-		<PackageReference Include="Alchyr.Sts2.ModAnalyzers" Version="0.1.9" />
+		<PackageReference Include="Alchyr.Sts2.ModAnalyzers" Version="0.1.9" PrivateAssets="All"/>
 		<AdditionalFiles Include="Pikcube.Common/localization/**/*.json" />
 		<AdditionalFiles Include="images/**" />
 	</ItemGroup>
