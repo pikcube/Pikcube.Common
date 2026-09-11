@@ -14,6 +14,15 @@ public static class PowerModelExtensions
     extension<T>(T instance) where T : PowerModel
     {
         /// <summary>
+        /// Create a mutable clone of the canonical model.
+        /// </summary>
+        /// <returns>A mutable clone of this model.</returns>
+        public T CreateMutable()
+        {
+            return (T?)instance.PrivatePropertyWrapper<T, PowerModel>("CanonicalInstance").Value?.ToMutable() ?? (T)instance.ToMutable();
+        }
+
+        /// <summary>
         /// Apply a power asyncronously using PowerCmd.Apply.
         /// </summary>
         /// <param name="choiceContext">The current choice context</param>

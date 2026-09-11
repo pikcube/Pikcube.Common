@@ -25,18 +25,6 @@ public static class CardModelExtensions
             set => BlinkModel.SetShouldBlink(instance, value);
         }
 
-
-        /// <summary>
-        /// Creates a mutable instance of a card and sets the card's owner to the player.
-        /// </summary>
-        /// <param name="player">The player who this card belongs to</param>
-        /// <returns>A mutable instance of T with the owner set.</returns>
-        [Obsolete("Prefer `Create` over `CreateInstance`")]
-        public static T CreateInstance(Player player)
-        {
-            return player.RunState.CreateCard<T>(player);
-        }
-
         /// <summary>
         /// Creates a mutable instance of a card for combat and sets the card's owner to the player.
         /// </summary>
@@ -67,14 +55,14 @@ public static class CardModelExtensions
             return ModelDb.Card<T>();
         }
 
+
         /// <summary>
-        /// Create an immutable instance of the card.
+        /// Create a mutable clone of the canonical model.
         /// </summary>
-        /// <returns>An immutable instance of T.</returns>
-        [Obsolete("Prefer `Create` over `CreateWithoutOwner`")]
-        public static T CreateWithoutOwner()
+        /// <returns>A mutable clone of this model.</returns>
+        public T CreateMutable()
         {
-            return ModelDb.Card<T>();
+            return (T)instance.CanonicalInstance.ToMutable();
         }
 
         /// <summary>

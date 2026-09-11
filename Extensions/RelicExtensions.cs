@@ -10,7 +10,7 @@ namespace Pikcube.Common.Extensions;
 /// </summary>
 public static class RelicExtensions
 {
-    extension<T>(T relic) where T : RelicModel
+    extension<T>(T instance) where T : RelicModel
     {
         /// <summary>
         /// Upgrade all cards in a card reward if the provided predicate is true. Flashes the relic when the card is revealed.
@@ -23,9 +23,9 @@ public static class RelicExtensions
             filter ??= _ => true;
             foreach (CardCreationResult cardCreationResult in cards.Where(c => c.Card.IsUpgradable && filter(c.Card)))
             {
-                CardModel card = relic.Owner.RunState.CloneCard(cardCreationResult.Card);
+                CardModel card = instance.Owner.RunState.CloneCard(cardCreationResult.Card);
                 CardCmd.Upgrade(card);
-                cardCreationResult.ModifyCard(card, relic);
+                cardCreationResult.ModifyCard(card, instance);
             }
         }
 
@@ -33,5 +33,14 @@ public static class RelicExtensions
         /// Get the canonical instance of a relic.
         /// </summary>
         public static T Canonical => (T)ModelDb.Relic<T>().CanonicalInstance;
+
+        /// <summary>
+        /// Create a mutable clone of the canonical model.
+        /// </summary>
+        /// <returns>A mutable clone of this model.</returns>
+        public T CreateMutable()
+        {
+            return (T)instance.CanonicalInstance.ToMutable();
+        }
     }
 }
