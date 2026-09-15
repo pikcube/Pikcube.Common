@@ -16,4 +16,10 @@ public interface ICustomEndTurnPingMachine
     /// <param name="key">The key being fetched.</param>
     /// <returns>The <see cref="LocString"/> to display to the player.</returns>
     public LocString GetNext(Player player, string table, string key);
+
+    /// <summary>
+    /// Get the LocString that was just generated.
+    /// </summary>
+    /// <returns>The <see cref="LocString"/> that was just displayed.</returns>
+    public LocString GetLast();
 }

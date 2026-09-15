@@ -14,20 +14,28 @@ internal static class CreateEndTurnPingDialogueIfNecessaryPatch
     {
         foreach (CodeInstruction instruction in instructions)
         {
-            if (instruction.opcode != OpCodes.Newobj || //Opcode is wrong
-                instruction.operand is not ConstructorInfo info || //Operand type is wrong
-                info.DeclaringType != typeof(LocString)) //ctor is wrong type
+            if (instruction.opcode == OpCodes.Newobj && //Opcode is correct
+                instruction.operand is ConstructorInfo info && //Operand type is correct
+                info.DeclaringType == typeof(LocString)) //ctor is correct type
+            {
+                yield return CodeInstruction.LoadArgument(1);
+
+                //CustomEndTurnPingManager.GetEndTurnPingLocString(string table, string key, Player player)
+                yield return CodeInstruction.Call(() => CustomEndTurnPingManager.GetEndTurnPingLocString(null!, null!, null!));
+            }
+            else if (instruction.opcode == OpCodes.Ldc_R8)
+            {
+                yield return CodeInstruction.LoadArgument(1);
+                yield return instruction;
+                yield return CodeInstruction.Call(() => CustomEndTurnPingManager.GetLength(null!, 0));
+            }
+            else
             {
                 yield return instruction; //Do not modify instruction
-                continue;
             }
 
 
             //Add argument 1 (the current player) to the evalucation stack to it gets passed to the manager
-            yield return CodeInstruction.LoadArgument(1);
-
-            //CustomEndTurnPingManager.GetEndTurnPingLocString(string table, string key, Player player)
-            yield return CodeInstruction.Call(() => CustomEndTurnPingManager.GetEndTurnPingLocString(null!, null!, null!));
         }
     }
 }

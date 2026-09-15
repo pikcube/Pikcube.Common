@@ -16,6 +16,8 @@ public class SimpleEndTurnPingMachine : ICustomEndTurnPingMachine
 
     private DynamicVarSet DynamicVars { get; init; }
 
+    private LocString Last { get; set; }
+
     /// <summary>
     /// Basic implementation of an End Turn Ping State Machine.<br/>
     /// Entries take the form of `banter.alive.endTurnPing.X`, where X is the index.
@@ -54,14 +56,26 @@ public class SimpleEndTurnPingMachine : ICustomEndTurnPingMachine
         IndexDict.TryAdd(key, -1);
         ++IndexDict[key];
 
-        LocString? current = LocString.GetIfExists(table, $"{key}.{IndexDict[key]}");
-        if (current is not null)
-        {
-            return current.WithDynamicVars(DynamicVars);
-        }
+        Last = GetLocString();
+        return Last;
 
-        IndexDict[key] = 0;
-        return (LocString.GetIfExists(table, $"{key}.{IndexDict[key]}") ?? new LocString(table, key))
-            .WithDynamicVars(DynamicVars);
+        LocString GetLocString()
+        {
+            LocString? current = LocString.GetIfExists(table, $"{key}.{IndexDict[key]}");
+            if (current is not null)
+            {
+                return current.WithDynamicVars(DynamicVars);
+            }
+
+            IndexDict[key] = 0;
+            return (LocString.GetIfExists(table, $"{key}.{IndexDict[key]}") ?? new LocString(table, key))
+                .WithDynamicVars(DynamicVars);
+        }
+    }
+
+    /// <inheritdoc />
+    public LocString GetLast()
+    {
+        return Last;
     }
 }
