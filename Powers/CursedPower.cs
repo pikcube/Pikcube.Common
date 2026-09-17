@@ -155,10 +155,8 @@ public class CursedPower : CustomPowerModel
             {
                 NGame.Instance.CurrentRunNode.GlobalUi.AddChildSafely(NSmokyVignetteVfx.Create(new Color(0.3f, 0.3f, 0.3f, 0.66f), new Color(1.0f, 1.0f, 1f, 0.33f)));
             }
-
-            await CardPileCmd.Add(card, PileType.Draw, CardPilePosition.Top);
         }
-
+        await CardPileCmd.Add(card, PileType.Draw, CardPilePosition.Top);
         await PowerCmd.Decrement(this);
     }
 
