@@ -16,7 +16,7 @@ public class SimpleEndTurnPingMachine : ICustomEndTurnPingMachine
 
     private DynamicVarSet DynamicVars { get; init; }
 
-    private LocString Last { get; set; }
+    private LocString? Last { get; set; }
 
     /// <summary>
     /// Basic implementation of an End Turn Ping State Machine.<br/>
