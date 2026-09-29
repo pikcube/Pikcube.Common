@@ -1,4 +1,5 @@
-﻿using MegaCrit.Sts2.Core.Entities.Players;
+﻿using System.Data;
+using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Runs;
@@ -76,6 +77,6 @@ public class SimpleEndTurnPingMachine : ICustomEndTurnPingMachine
     /// <inheritdoc />
     public LocString GetLast()
     {
-        return Last ?? throw new InvalidOperationException();
+        return Last ?? throw new NoNullAllowedException();
     }
 }
