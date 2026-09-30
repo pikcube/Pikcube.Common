@@ -21,7 +21,8 @@ public class PurpleKeywordManager() : CustomSingletonModel(HookType.Combat)
 
     private static void BetterHooks_ModifyCardText(CardModel card, ref List<string> lines)
     {
-        foreach (CardKeyword keyword in card.Keywords.Where(keyword => IsPurpleKeyword(keyword, card)))
+        ISet<CardKeyword> purpleKeywords = GetGlobalPurpleKeywords(card);
+        foreach (CardKeyword keyword in card.Keywords.Where(keyword => IsPurpleKeyword(keyword, card, purpleKeywords)))
         {
             string original = (string?)GetTextMethod.Invoke(null, [keyword]) ?? string.Empty;
             string newValue = original.Replace("gold]", "purple]");
@@ -45,7 +46,7 @@ public class PurpleKeywordManager() : CustomSingletonModel(HookType.Combat)
         return Task.CompletedTask;
     }
 
-    internal static List<PurpleKeywordInstance> RegisteredPurpleKeywords { get; } = [];
+    internal static HashSet<PurpleKeywordInstance> RegisteredPurpleKeywords { get; } = [];
 
 
     internal static void Register<T>(T instance, CardKeyword keyword) where T : CardModel
@@ -59,10 +60,25 @@ public class PurpleKeywordManager() : CustomSingletonModel(HookType.Combat)
         }
     }
 
-    internal static bool IsPurpleKeyword(CardKeyword keyword, CardModel cardModel)
+    private static bool IsPurpleKeyword(CardKeyword keyword, CardModel cardModel, ISet<CardKeyword> globalPurpleKeywords)
     {
-        return RegisteredPurpleKeywords.Any(purp => purp.Card == cardModel && purp.Keyword == keyword) || 
+        return globalPurpleKeywords.Contains(keyword) || 
+               RegisteredPurpleKeywords.Any(purp => purp.Card == cardModel && purp.Keyword == keyword) || 
                TempKeywordManager.IsTempKeyword(keyword, cardModel);
+    }
+
+    internal static ISet<CardKeyword> GetGlobalPurpleKeywords(CardModel cardModel)
+    {
+        HashSet<CardKeyword> purpleKeywords = [];
+        foreach (IPurpleKeywordModifier pkm in cardModel.CombatState?.IterateHookListeners().OfType<IPurpleKeywordModifier>() ?? [])
+        {
+            HashSet<CardKeyword> keywords = [];
+            pkm.TryModifyKeywordsInCombat(cardModel, keywords);
+            keywords.IntersectWith(pkm.PurpleKeywords);
+            purpleKeywords.UnionWith(keywords);
+        }
+
+        return purpleKeywords;
     }
 }
 

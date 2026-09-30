@@ -51,11 +51,11 @@ public class TempKeywordManager() : CustomSingletonModel(HookType.Combat)
 
     internal static void DestroyKeywordsEarly<T>(T instance, CardKeyword keyword) where T : CardModel
     {
-        CurrentTempKeywords.RemoveAll(trio => trio.Item1 == instance && trio.Item2 == keyword);
+        CurrentTempKeywords.RemoveWhere(trio => trio.Item1 == instance && trio.Item2 == keyword);
     }
 
 
-    private static List<(CardModel, CardKeyword, object?, bool)> CurrentTempKeywords { get; } = [];
+    private static HashSet<(CardModel, CardKeyword, object?, bool)> CurrentTempKeywords { get; } = [];
 
     static TempKeywordManager()
     {
@@ -69,7 +69,7 @@ public class TempKeywordManager() : CustomSingletonModel(HookType.Combat)
             .Where(pair => pair.Item1 == original)
             .Select(pair => (clone, pair.Item2, pair.Item3, pair.Item4))];
 
-        CurrentTempKeywords.AddRange(toAdd);
+        CurrentTempKeywords.UnionWith(toAdd);
     }
 
     private static void BetterHooks_AfterRunInitialized(RunState runState)
@@ -89,7 +89,7 @@ public class TempKeywordManager() : CustomSingletonModel(HookType.Combat)
         {
             cardModel.RemoveKeyword(cardKeyword);
         }
-        CurrentTempKeywords.RemoveAll(set => !set.Item4);
+        CurrentTempKeywords.RemoveWhere(set => !set.Item4);
     }
 
     internal static bool IsTempKeyword(CardKeyword keyword, CardModel cardModel)

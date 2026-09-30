@@ -16,7 +16,6 @@ using MegaCrit.Sts2.Core.Nodes.Rooms;
 using MegaCrit.Sts2.Core.Nodes.Vfx;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves;
-using Pikcube.Common.Extensions;
 using Pikcube.Common.Keywords;
 using Pikcube.Common.Utility;
 
@@ -28,15 +27,15 @@ namespace Pikcube.Common.Powers;
 /// Cards that aren't played are exhuasted for the turn, and are placed on top of the draw pile at the end of the round.
 /// </summary>
 [UsedImplicitly]
-public class CursedPower : CustomPowerModel
+public class CursedPower : CustomPowerModel, IPurpleKeywordModifier
 { 
     /// <inheritdoc />
     public override PowerType Type => PowerType.Debuff;
 
     /// <inheritdoc />
+    public ISet<CardKeyword> PurpleKeywords => new HashSet<CardKeyword>([CursedModel.Cursed]);
+    /// <inheritdoc />
     public override PowerStackType StackType => PowerStackType.Counter;
-
-    private List<CardModel> ValidCards { get; set; } = null!;
     private List<CardModel> CursedCards { get; set; } = null!;
     private List<CardModel> IgnoredCards { get; set; } = null!;
     private Player? OwningPlayer { get; set; }
@@ -54,7 +53,6 @@ public class CursedPower : CustomPowerModel
     {
         base.AfterCloned();
         OwningPlayer = null;
-        ValidCards = [];
         CursedCards = [];
         IgnoredCards = [];
     }
@@ -74,20 +72,20 @@ public class CursedPower : CustomPowerModel
         if (owningPlayerPlayerCombatState is null)
         {
             await PowerCmd.Remove(this);
-            return;
         }
+    }
 
-        ValidCards.Clear();
-
-        ValidCards.AddRange(owningPlayerPlayerCombatState.DrawPile.Cards);
-        ValidCards.AddRange(owningPlayerPlayerCombatState.Hand.Cards);
-        ValidCards.AddRange(owningPlayerPlayerCombatState.DiscardPile.Cards);
-        ValidCards.AddRange(owningPlayerPlayerCombatState.PlayPile.Cards);
-
-        foreach (CardModel card in ValidCards)
+    /// <inheritdoc />
+    public override bool TryModifyKeywordsInCombat(CardModel card, ISet<CardKeyword> keywords)
+    {
+        if (card.Owner != OwningPlayer)
         {
-            card.AddTempKeyword(CursedModel.Cursed, this, true);
+            return false;
         }
+
+        keywords.Add(CursedModel.Cursed);
+        return true;
+
     }
 
     /// <inheritdoc />
@@ -111,7 +109,7 @@ public class CursedPower : CustomPowerModel
         }
         bool isIgnored = IgnoredCards.Remove(card);
 
-        if (isIgnored || !ValidCards.Contains(card) || card.Keywords.All(c => c != CursedModel.Cursed) || card.Owner != OwningPlayer || card.IsDupe || OwningPlayer.RunState.Rng.CombatCardSelection.NextBool() is not true)
+        if (isIgnored || card.Keywords.All(c => c != CursedModel.Cursed) || card.Owner != OwningPlayer || card.IsDupe || OwningPlayer.RunState.Rng.CombatCardSelection.NextBool() is not true)
         {
             return playCount;
         }
@@ -179,7 +177,6 @@ public class CursedPower : CustomPowerModel
         {
             return Task.CompletedTask;
         }
-        ValidCards.Clear();
         IgnoredCards.Clear();
         CursedCards.Clear();
         return Task.CompletedTask;
