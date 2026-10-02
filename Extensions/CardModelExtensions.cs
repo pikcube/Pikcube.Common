@@ -87,9 +87,9 @@ public static class CardModelExtensions
         }
 
         /// <summary>
-        /// Add a Keyword to this card. It is Purple.
+        /// Add a <see cref="CardKeyword"/> to this <see cref="CardModel"/>. It is Purple.
         /// </summary>
-        /// <param name="keyword">The keyword to add to the card.</param>
+        /// <param name="keyword">The <see cref="CardKeyword"/> to add to the <see cref="CardModel"/>.</param>
         public void AddPurpleKeyword(CardKeyword keyword)
         {
             PurpleKeywordManager.Register(instance, keyword);
