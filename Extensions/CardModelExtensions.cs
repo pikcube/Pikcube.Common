@@ -4,7 +4,6 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
-using Pikcube.Common.Keywords;
 using Pikcube.Common.Utility;
 
 namespace Pikcube.Common.Extensions;
@@ -16,15 +15,6 @@ public static class CardModelExtensions
 {
     extension<T>(T instance) where T : CardModel
     {
-        /// <summary>
-        /// Determines if this card should be Blinked on the next card play. Is defined to be false if the card should exhaust on next play instead.
-        /// </summary>
-        public bool ShouldBlinkOnNextPlay
-        {
-            get => BlinkModel.ShouldBlink(instance);
-            set => BlinkModel.SetShouldBlink(instance, value);
-        }
-
         /// <summary>
         /// Creates a mutable instance of a card for combat and sets the card's owner to the player.
         /// </summary>
@@ -113,24 +103,6 @@ public static class CardModelExtensions
         public Task ExhaustAsync(PlayerChoiceContext choiceContext, bool causedByEthereal = false, bool skipVisuals = false)
         {
             return CardCmd.Exhaust(choiceContext, instance, causedByEthereal, skipVisuals);
-        }
-
-        /// <summary>
-        /// Blink target card by calling BlinkModel.BlinkCardAsync
-        /// </summary>
-        /// <param name="choiceContext">The player choice context</param>
-        public Task BlinkAsync(PlayerChoiceContext choiceContext)
-        {
-            return BlinkModel.BlinkCardAsync(choiceContext, instance);
-        }
-
-        /// <summary>
-        /// Entrance target card by calling EntranceModel.EntranceCardAsync
-        /// </summary>
-        /// <param name="choiceContext">The player choice context</param>
-        public Task EntranceAsync(PlayerChoiceContext choiceContext)
-        {
-            return EntranceModel.EntranceCardAsync(choiceContext, instance);
         }
 
         /// <summary>
