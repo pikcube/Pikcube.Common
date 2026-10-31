@@ -16,41 +16,26 @@ internal static class ModifyCardDescriptionPatch
         return methods.Single(m => m is { Name: "GetDescriptionForPile", IsPrivate: true });
     }
 
+#pragma warning disable CA1806
     [UsedImplicitly]
     public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
     {
-        List<CodeInstruction> code = [.. instructions];
-        for (int n = code.Count - 1; n >= 0; --n)
-        {
-            CodeInstruction ilCode = code[n];
-            if (ilCode.opcode != OpCodes.Ldloc_S)
-            {
-                continue;
-            }
+        CodeMatcher matcher = new CodeMatcher(instructions);
 
-            object operand = ilCode.operand;
-            int? localIndex = AccessTools.DeclaredProperty(operand.GetType(), "LocalIndex").GetValue(operand) as int?;
-            if (localIndex is not 5)
-            {
-                throw new Exception("Your patch broke, index of local variable `List<string> sources` is no longer 5.");
-            }
+        matcher.MatchStartForward(CodeMatch.Calls(() => string.Join('n', Enumerable.Empty<string>())));
+        matcher.InsertAndAdvance(CodeInstruction.LoadArgument(0));
+        matcher.InsertAndAdvance(CodeInstruction.Call(() => ModifyListOfStrings(null!, null!)));
 
-            code.Insert(n + 1, new CodeInstruction(OpCodes.Ldarg_0));
-            code.Insert(n + 2, new CodeInstruction(OpCodes.Ldloc_S, operand));
-            code.Insert(n + 3, CodeInstruction.Call(() => ModifyListOfStrings(null!, null!)));
-            
-            break;
-        }
-
-        return code;
+        return matcher.InstructionEnumeration();
     }
+#pragma warning restore CA1806
+
 
     //Note that arguments will be passed in whatever order they are placed on the evaluation stack (leftmost being the bottom)
-    private static void ModifyListOfStrings(CardModel instance, List<string> lines)
+    private static IEnumerable<string> ModifyListOfStrings(IEnumerable<string> lines, CardModel instance)
     {
         List<string> newLines = [.. lines];
         BetterHooks.OnModifyCardText(instance, ref newLines);
-        lines.Clear();
-        lines.AddRange(newLines);
+        return newLines;
     }
 }
