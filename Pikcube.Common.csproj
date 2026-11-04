@@ -8,7 +8,7 @@
 		<DefaultItemExcludes>packages/**</DefaultItemExcludes>
 		<AppOutputBase>$(MSBuildProjectDirectory)\</AppOutputBase>
 		<PathMap>$(AppOutputBase)=.\</PathMap>
-		<VersionPrefix>0.3.15</VersionPrefix>
+		<VersionPrefix>0.3.17</VersionPrefix>
 	</PropertyGroup>
 
 	<!-- OS Detection -->
@@ -74,10 +74,6 @@
 		<RepositoryType>git</RepositoryType>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<IncludeSymbols>True</IncludeSymbols> 
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ExportRelease|AnyCPU'">
-	  <Optimize>True</Optimize>
 	</PropertyGroup>
 
 	<ItemGroup Condition="Exists('$(Sts2DataDir)')">
