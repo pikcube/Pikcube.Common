@@ -19,7 +19,7 @@ public static class PowerModelExtensions
         /// <returns>A mutable clone of this model.</returns>
         public T CreateMutable()
         {
-            return (T?)instance.PrivatePropertyWrapper<T, PowerModel>("CanonicalInstance").Value?.ToMutable() ?? (T)instance.ToMutable();
+            return (T?)instance.PrivatePropertyWrapper<PowerModel, PowerModel>("CanonicalInstance").Value?.ToMutable() ?? (T)instance.ToMutable();
         }
 
         /// <summary>
