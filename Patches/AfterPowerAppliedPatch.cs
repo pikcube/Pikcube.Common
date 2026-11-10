@@ -11,26 +11,8 @@ namespace Pikcube.Common.Patches;
 internal class AfterPowerAppliedPatch
 {
     [UsedImplicitly]
-    static IEnumerable<MethodBase> TargetMethods()
-    {
-        MethodInfo? afterAppliedMethod = typeof(PowerModel).GetMethod(nameof(PowerModel.AfterApplied));
-        if (afterAppliedMethod is not null)
-        {
-            yield return afterAppliedMethod;
-        }
-
-        foreach (Type? type in AccessTools.AllTypes()
-                     .Where(t => t.IsSubclassOf(typeof(PowerModel)) && !t.IsAbstract))
-        {
-            MethodInfo? method = type.GetMethod(nameof(PowerModel.AfterApplied),
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-
-            if (method != null && method.DeclaringType != typeof(PowerModel))
-            {
-                yield return method;
-            }
-        }
-    }
+    static IEnumerable<MethodBase> TargetMethods() =>
+        PatchingUtilities.TargetMethodOverrides(typeof(PowerModel), nameof(PowerModel.AfterApplied));
 
     [UsedImplicitly]
     static Task Postfix(Task __result, PowerModel __instance, Creature? applier, CardModel? cardSource)

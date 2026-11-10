@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using System.Reflection.Emit;
 using HarmonyLib;
 using JetBrains.Annotations;
 using MegaCrit.Sts2.Core.Models;
@@ -30,7 +29,7 @@ internal static class ModifyCardDescriptionPatch
     }
 #pragma warning restore CA1806
 
-
+    [UsedImplicitly]
     //Note that arguments will be passed in whatever order they are placed on the evaluation stack (leftmost being the bottom)
     private static IEnumerable<string> ModifyListOfStrings(IEnumerable<string> lines, CardModel instance)
     {

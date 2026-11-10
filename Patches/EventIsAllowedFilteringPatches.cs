@@ -11,26 +11,8 @@ namespace Pikcube.Common.Patches;
 internal static class EventIsAllowedFilteringPatches
 {
     [UsedImplicitly]
-    static IEnumerable<MethodBase> TargetMethods()
-    {
-        MethodInfo? isAllowedMethod = typeof(EventModel).GetMethod(nameof(EventModel.IsAllowed));
-        if (isAllowedMethod is not null)
-        {
-            yield return isAllowedMethod;
-        }
-
-        foreach (Type? type in AccessTools.AllTypes()
-                     .Where(t => t.IsSubclassOf(typeof(EventModel)) && !t.IsAbstract))
-        {
-            MethodInfo? method = type.GetMethod(nameof(EventModel.IsAllowed),
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-
-            if (method != null && method.DeclaringType != typeof(EventModel))
-            {
-                yield return method;
-            }
-        }
-    }
+    static IEnumerable<MethodBase> TargetMethods() =>
+        PatchingUtilities.TargetMethodOverrides(typeof(EventModel), nameof(EventModel.IsAllowed));
 
     [UsedImplicitly]
     static bool Postfix(bool __result, EventModel __instance, IRunState runState)

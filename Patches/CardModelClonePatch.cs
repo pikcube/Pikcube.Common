@@ -10,26 +10,8 @@ namespace Pikcube.Common.Patches;
 internal static class CardModelClonePatch
 {
     [UsedImplicitly]
-    static IEnumerable<MethodBase> TargetMethods()
-    {
-        MethodInfo? onPlayMethod = typeof(CardModel).GetMethod(nameof(CardModel.MutableClone));
-        if (onPlayMethod is not null)
-        {
-            yield return onPlayMethod;
-        }
-
-        foreach (Type? type in AccessTools.AllTypes()
-                     .Where(t => t.IsSubclassOf(typeof(CardModel)) && !t.IsAbstract))
-        {
-            MethodInfo? method = type.GetMethod(nameof(CardModel.MutableClone),
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-
-            if (method != null && method.DeclaringType != typeof(CardModel))
-            {
-                yield return method;
-            }
-        }
-    }
+    static IEnumerable<MethodBase> TargetMethods() =>
+        PatchingUtilities.TargetMethodOverrides(typeof(CardModel), nameof(CardModel.MutableClone));
 
     [UsedImplicitly]
     internal static void Postfix(AbstractModel __result, AbstractModel __instance)

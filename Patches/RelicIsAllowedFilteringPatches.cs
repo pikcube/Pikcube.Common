@@ -11,26 +11,7 @@ namespace Pikcube.Common.Patches;
 internal static class RelicIsAllowedFilteringPatches
 {
     [UsedImplicitly]
-    static IEnumerable<MethodBase> TargetMethods()
-    {
-        MethodInfo? isAllowedMethod = typeof(RelicModel).GetMethod(nameof(RelicModel.IsAllowed));
-        if (isAllowedMethod is not null)
-        {
-            yield return isAllowedMethod;
-        }
-
-        foreach (Type? type in AccessTools.AllTypes()
-                     .Where(t => t.IsSubclassOf(typeof(RelicModel)) && !t.IsAbstract))
-        {
-            MethodInfo? method = type.GetMethod(nameof(RelicModel.IsAllowed),
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-
-            if (method != null && method.DeclaringType != typeof(RelicModel))
-            {
-                yield return method;
-            }
-        }
-    }
+    static IEnumerable<MethodBase> TargetMethods() => PatchingUtilities.TargetMethodOverrides(typeof(RelicModel), nameof(RelicModel.IsAllowed));
 
     [UsedImplicitly]
     static bool Postfix(bool __result, RelicModel __instance, IRunState runState)
