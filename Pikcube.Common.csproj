@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Godot.NET.Sdk/4.5.1" InitialTargets="CheckDependencyPaths">
 	<PropertyGroup>
 		<TargetFramework>net9.0</TargetFramework>
-		<LangVersion>14.0</LangVersion>
+		<LangVersion>15.0</LangVersion>
 		<ImplicitUsings>true</ImplicitUsings>
 		<Nullable>enable</Nullable> <!--Makes code analysis regarding null values stricter.-->
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<DefaultItemExcludes>packages/**</DefaultItemExcludes>
 		<AppOutputBase>$(MSBuildProjectDirectory)\</AppOutputBase>
 		<PathMap>$(AppOutputBase)=.\</PathMap>
-		<VersionPrefix>0.3.18</VersionPrefix>
+		<VersionPrefix>0.3.20</VersionPrefix>
 	</PropertyGroup>
 
 	<!-- OS Detection -->

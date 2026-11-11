@@ -1,0 +1,117 @@
+﻿using MegaCrit.Sts2.Core.Combat;
+using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Models;
+using Pikcube.Common.Code.Utility;
+
+namespace Pikcube.Common.Code.Extensions;
+
+/// <summary>
+/// Defines an extension block that adds additional methods to all types that implement CardModel
+/// </summary>
+public static class CardModelExtensions
+{
+    extension<T>(T instance) where T : CardModel
+    {
+        /// <summary>
+        /// Creates a mutable instance of a card for combat and sets the card's owner to the player.
+        /// </summary>
+        /// <param name="player">The player who this card belongs to</param>
+        /// <param name="combatstate">The current combat state</param>
+        /// <returns>A mutable instance of T with the owner set.</returns>
+        public static T Create(Player player, ICombatState combatstate)
+        {
+            return combatstate.CreateCard<T>(player);
+        }
+
+        /// <summary>
+        /// Creates a mutable instance of a card and sets the card's owner to the player.
+        /// </summary>
+        /// <param name="player">The player who this card belongs to</param>
+        /// <returns>A mutable instance of T with the owner set.</returns>
+        public static T Create(Player player)
+        {
+            return player.RunState.CreateCard<T>(player);
+        }
+
+        /// <summary>
+        /// Create an immutable instance of the card.
+        /// </summary>
+        /// <returns>An immutable instance of T.</returns>
+        public static T Create()
+        {
+            return ModelDb.Card<T>();
+        }
+
+
+        /// <summary>
+        /// Create a mutable clone of the canonical model.
+        /// </summary>
+        /// <returns>A mutable clone of this model.</returns>
+        public T CreateMutable()
+        {
+            return (T)instance.CanonicalInstance.ToMutable();
+        }
+
+        /// <summary>
+        /// Creates a mutable instance of a card and sets the card's owner to the player.
+        /// </summary>
+        /// <param name="player">The player who this card will belong to.</param>
+        /// <returns>A mutable instance of T with the owner set.</returns>
+        public T CreateNewInstance(Player player)
+        {
+            return (T)player.RunState.CreateCard(instance.CanonicalInstance, player);
+        }
+
+        /// <summary>
+        /// Add a Keyword to this card until the start of next turn.
+        /// </summary>
+        /// <param name="keyword">The keyword to temporarily add</param>
+        /// <param name="source">Optional: The object registering the keyword. Allows for early destruction by calling DestroyKeywordsEarly</param>
+        /// <param name="isManualDestoryRequired">Keyword must be destroyed by calling DestroyKeywordsEarly</param>
+        public void AddTempKeyword(CardKeyword keyword, object? source = null, bool isManualDestoryRequired = false)
+        {
+            TempKeywordManager.Register(instance, keyword, source, isManualDestoryRequired);
+        }
+
+        /// <summary>
+        /// Add a <see cref="CardKeyword"/> to this <see cref="CardModel"/>. It is Purple.
+        /// </summary>
+        /// <param name="keyword">The <see cref="CardKeyword"/> to add to the <see cref="CardModel"/>.</param>
+        public void AddPurpleKeyword(CardKeyword keyword)
+        {
+            PurpleKeywordManager.Register(instance, keyword);
+        }
+
+        /// <summary>
+        /// Remove a Keyword prematurely.
+        /// </summary>
+        /// <param name="keyword">The keyword to remove.</param>
+        public void RemoveTempKeywordEarly(CardKeyword keyword)
+        {
+            TempKeywordManager.DestroyKeywordsEarly(instance, keyword);
+        }
+
+        /// <summary>
+        /// Exhaust target card by calling CardCmd.ExhaustAsync
+        /// </summary>
+        /// <param name="choiceContext">The player choice context</param>
+        /// <param name="causedByEthereal">True if caused by Etherial</param>
+        /// <param name="skipVisuals">True if visuals should be skipped</param>
+        public Task ExhaustAsync(PlayerChoiceContext choiceContext, bool causedByEthereal = false, bool skipVisuals = false)
+        {
+            return CardCmd.Exhaust(choiceContext, instance, causedByEthereal, skipVisuals);
+        }
+
+        /// <summary>
+        /// Discard target card by calling CardCmd.Discard
+        /// </summary>
+        /// <param name="choiceContext">The player choice context</param>
+        public Task DiscardAsync(PlayerChoiceContext choiceContext)
+        {
+            return CardCmd.Discard(choiceContext, instance);
+        }
+    }
+}

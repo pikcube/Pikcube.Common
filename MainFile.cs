@@ -7,9 +7,9 @@ using MegaCrit.Sts2.Core.Logging;
 using MegaCrit.Sts2.Core.Modding;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Events;
-using Pikcube.Common.Extensions;
-using Pikcube.Common.Patches;
-using Pikcube.Common.Utility;
+using Pikcube.Common.Code.Extensions;
+using Pikcube.Common.Code.Patches;
+using Pikcube.Common.Code.Utility;
 using Logger = MegaCrit.Sts2.Core.Logging.Logger;
 
 namespace Pikcube.Common;

@@ -1,0 +1,46 @@
+﻿using JetBrains.Annotations;
+using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Models;
+
+namespace Pikcube.Common.Code.Extensions;
+
+/// <summary>
+/// Defines an extension block on all types inheriting from RelicModel
+/// </summary>
+public static class RelicExtensions
+{
+    extension<T>(T instance) where T : RelicModel
+    {
+        /// <summary>
+        /// Upgrade all cards in a card reward if the provided predicate is true. Flashes the relic when the card is revealed.
+        /// </summary>
+        /// <param name="cards">The cards to upgrade.</param>
+        /// <param name="filter">A function that returns true if the card should be upgraded.</param>
+        [UsedImplicitly]
+        public void UpgradeValidCards(IEnumerable<CardCreationResult> cards, Predicate<CardModel>? filter = null)
+        {
+            filter ??= _ => true;
+            foreach (CardCreationResult cardCreationResult in cards.Where(c => c.Card.IsUpgradable && filter(c.Card)))
+            {
+                CardModel card = instance.Owner.RunState.CloneCard(cardCreationResult.Card);
+                CardCmd.Upgrade(card);
+                cardCreationResult.ModifyCard(card, instance);
+            }
+        }
+
+        /// <summary>
+        /// Get the canonical instance of a relic.
+        /// </summary>
+        public static T Canonical => (T)ModelDb.Relic<T>().CanonicalInstance;
+
+        /// <summary>
+        /// Create a mutable clone of the canonical model.
+        /// </summary>
+        /// <returns>A mutable clone of this model.</returns>
+        public T CreateMutable()
+        {
+            return (T)instance.CanonicalInstance.ToMutable();
+        }
+    }
+}
