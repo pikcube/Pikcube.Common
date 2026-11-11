@@ -12,7 +12,7 @@ using Pikcube.Common.Code.Patches;
 using Pikcube.Common.Code.Utility;
 using Logger = MegaCrit.Sts2.Core.Logging.Logger;
 
-namespace Pikcube.Common;
+namespace Pikcube.Common.Code;
 
 /// <summary>
 /// Pikcube.Common Initializer
