@@ -16,7 +16,6 @@ using MegaCrit.Sts2.Core.Nodes.Rooms;
 using MegaCrit.Sts2.Core.Nodes.Vfx;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves;
-using Pikcube.Common.Code.Keywords;
 using Pikcube.Common.Code.Utility;
 
 namespace Pikcube.Common.Code.Powers;
@@ -41,7 +40,7 @@ public class CursedPower : CustomPowerModel
             return;
         }
 
-        if (card.Owner.Creature.HasPower<CursedPower>() && card.IsInCombat)
+        if (card.IsInCombat && card.Owner.Creature.HasPower<CursedPower>())
         {
             lines.Insert(0, "[purple]Cursed[/purple]");
         }

@@ -8,8 +8,8 @@ namespace Pikcube.Common.Code.Patches;
 internal static class ReverseRelicOption
 {
     [HarmonyReversePatch]
-    [HarmonyPatch(typeof(AncientEventModel), "RelicOption", typeof(RelicModel), typeof(string), typeof(string))]
-    internal static EventOption RelicOption(object instance, RelicModel relic, string pageName = "INITIAL", string? customDonePage = null)
+    [HarmonyPatch(typeof(AncientEventModel), "RelicOption", typeof(RelicModel), typeof(string))]
+    internal static EventOption RelicOption(object instance, RelicModel relic, string pageName = "INITIAL")
     {
         throw new NotImplementedException();
     }
