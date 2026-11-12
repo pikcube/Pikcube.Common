@@ -19,14 +19,24 @@ public class PurpleKeywordManager() : CustomSingletonModel(HookType.Combat)
         BetterHooks.ModifyCardText += BetterHooks_ModifyCardText;
     }
 
+    private static Dictionary<CardKeyword, (string, string)> PurpleValue { get; } = [];
+
     private static void BetterHooks_ModifyCardText(CardModel card, ref List<string> lines)
     {
         ISet<CardKeyword> purpleKeywords = GetGlobalPurpleKeywords(card);
         foreach (CardKeyword keyword in card.Keywords.Where(keyword => IsPurpleKeyword(keyword, card, purpleKeywords)))
         {
-            string original = (string?)GetTextMethod.Invoke(null, [keyword]) ?? string.Empty;
-            string newValue = original.Replace("gold]", "purple]");
-            lines.TryReplaceValue(original, newValue);
+            if (PurpleValue.TryGetValue(keyword, out (string, string) cache))
+            {
+                lines.TryReplaceValue(cache.Item1, cache.Item2);
+            }
+            else
+            {
+                string original = (string?)GetTextMethod.Invoke(null, [keyword]) ?? string.Empty;
+                string newValue = original.Replace("gold]", "purple]");
+                PurpleValue.Add(keyword, (original, newValue));
+                lines.TryReplaceValue(original, newValue);
+            }
         }
     }
 

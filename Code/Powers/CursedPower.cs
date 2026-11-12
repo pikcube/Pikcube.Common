@@ -27,17 +27,32 @@ namespace Pikcube.Common.Code.Powers;
 /// Cards that aren't played are exhuasted for the turn, and are placed on top of the draw pile at the end of the round.
 /// </summary>
 [UsedImplicitly]
-public class CursedPower : CustomPowerModel, IPurpleKeywordModifier
-{ 
-    /// <inheritdoc />
-    public override PowerType Type => PowerType.Debuff;
+public class CursedPower : CustomPowerModel
+{
+    static CursedPower()
+    {
+        BetterHooks.ModifyCardText += BetterHooks_ModifyCardText;
+    }
+
+    private static void BetterHooks_ModifyCardText(CardModel card, ref List<string> lines)
+    {
+        if (card.IsCanonical)
+        {
+            return;
+        }
+
+        if (card.Owner.Creature.HasPower<CursedPower>() && card.IsInCombat)
+        {
+            lines.Insert(0, "[purple]Cursed[/purple]");
+        }
+    }
 
     /// <inheritdoc />
-    public ISet<CardKeyword> PurpleKeywords => new HashSet<CardKeyword>([CursedModel.Cursed]);
+    public override PowerType Type => PowerType.Debuff;
     /// <inheritdoc />
     public override PowerStackType StackType => PowerStackType.Counter;
-    private List<CardModel> CursedCards { get; set; } = null!;
-    private List<CardModel> IgnoredCards { get; set; } = null!;
+    private HashSet<CardModel> CursedCards { get; set; } = null!;
+    private HashSet<CardModel> IgnoredCards { get; set; } = null!;
     private Player? OwningPlayer { get; set; }
 
     ///// <inheritdoc />
@@ -76,19 +91,6 @@ public class CursedPower : CustomPowerModel, IPurpleKeywordModifier
     }
 
     /// <inheritdoc />
-    public override bool TryModifyKeywordsInCombat(CardModel card, ISet<CardKeyword> keywords)
-    {
-        if (card.Owner != OwningPlayer)
-        {
-            return false;
-        }
-
-        keywords.Add(CursedModel.Cursed);
-        return true;
-
-    }
-
-    /// <inheritdoc />
     public override Task BeforeCardAutoPlayed(CardModel card, Creature? target, AutoPlayType type)
     {
         if (card.Owner != OwningPlayer || type == AutoPlayType.SlyDiscard)
@@ -109,7 +111,7 @@ public class CursedPower : CustomPowerModel, IPurpleKeywordModifier
         }
         bool isIgnored = IgnoredCards.Remove(card);
 
-        if (isIgnored || card.Keywords.All(c => c != CursedModel.Cursed) || card.Owner != OwningPlayer || card.IsDupe || OwningPlayer.RunState.Rng.CombatCardSelection.NextBool() is not true)
+        if (isIgnored || card.Owner != OwningPlayer || card.IsDupe || OwningPlayer.RunState.Rng.CombatCardSelection.NextBool() is not true)
         {
             return playCount;
         }
@@ -172,7 +174,6 @@ public class CursedPower : CustomPowerModel, IPurpleKeywordModifier
     /// <inheritdoc />
     public override Task AfterRemoved(Creature oldOwner)
     {
-        TempKeywordManager.DestroyKeywordsEarly(this);
         if (OwningPlayer is null)
         {
             return Task.CompletedTask;
