@@ -19,7 +19,6 @@ public class EventSpawnManager
         return !EventRules.TryGetValue(canidate.GetType(), out Dictionary<EventSpawnManager, Predicate<IRunState>>? rule) || rule.Values.All(p => p(runState));
     }
 
-
     /// <summary>
     /// Sets the rule for when this event is allowed to spawn.<br/>
     /// Throws an exception if a rule has already been registered for this event by this EventSpawnManager.
@@ -43,9 +42,19 @@ public class EventSpawnManager
     /// <typeparam name="T">The event this rule applies to.</typeparam>
     public bool TryRegisterRule<T>(Predicate<IRunState> rule) where T : EventModel
     {
-        EventRules.TryAdd(typeof(T), []);
+        return TryRegisterRule(typeof(T), rule);
+    }
 
-        Dictionary<EventSpawnManager, Predicate<IRunState>> ruleDic = EventRules[typeof(T)];
+    /// <summary>
+    /// Sets the rule for when this Event is allowed to spawn if no rule is already set.
+    /// </summary>
+    /// <param name="type">The event this rule applies to.</param>
+    /// <param name="rule">The predicate to invoke to determine if this Event can spawn.</param>
+    public bool TryRegisterRule(Type type, Predicate<IRunState> rule)
+    {
+        EventRules.TryAdd(type, []);
+
+        Dictionary<EventSpawnManager, Predicate<IRunState>> ruleDic = EventRules[type];
         if (ruleDic.ContainsKey(this))
         {
             return false;
