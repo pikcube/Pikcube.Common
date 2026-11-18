@@ -6,7 +6,7 @@ namespace Pikcube.Common.Code.Unions;
 /// Union type consisting of either a single item or many items.
 /// </summary>
 /// <typeparam name="T">The type of the items.</typeparam>
-public union OneOrMany<T>(T, IEnumerable<T>) : IEnumerable<T>
+public readonly union OneOrMany<T>(T, IEnumerable<T>) : IEnumerable<T>
 {
     /// <summary>
     /// Either return the original IEnumerable, or wrap the single item in an IEnumerable.

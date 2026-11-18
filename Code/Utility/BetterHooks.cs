@@ -302,4 +302,14 @@ public static class BetterHooks
     {
         ModifyCardText?.Invoke(instance, ref newLines);
     }
+
+    internal static bool OnModifyIsCardAllowed(IRunState runState, CardModel card)
+    {
+        if (card is IModifyCardIsAllowedListener listener)
+        {
+            return listener.IsAllowed(runState);
+        }
+
+        return true;
+    }
 }
